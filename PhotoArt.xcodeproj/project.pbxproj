@@ -7,21 +7,63 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		863793BC28F9776800C64A82 /* AccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793BB28F9776800C64A82 /* AccessController.swift */; };
+		863793BF28F978F200C64A82 /* AccessTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */; };
+		863793C128F9790E00C64A82 /* AccessDisappearAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */; };
+		8668D71928F73BAD00A2E72E /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71828F73BAC00A2E72E /* UIColor+Extensions.swift */; };
+		8668D71B28F751B300A2E72E /* Switcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71A28F751B300A2E72E /* Switcher.swift */; };
+		8668D71E28F7592400A2E72E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71D28F7592400A2E72E /* Tool.swift */; };
+		8668D72028F75ADB00A2E72E /* PencilTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71F28F75ADB00A2E72E /* PencilTool.swift */; };
+		8668D72428F7722E00A2E72E /* BrushTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D72328F7722E00A2E72E /* BrushTool.swift */; };
+		8668D72628F7735400A2E72E /* PenTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D72528F7735400A2E72E /* PenTool.swift */; };
+		8668D72828F77B0F00A2E72E /* EraseTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D72728F77B0F00A2E72E /* EraseTool.swift */; };
+		8668D72A28F8106100A2E72E /* DefaultTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D72928F8106100A2E72E /* DefaultTool.swift */; };
+		8668D72C28F8117300A2E72E /* DefaultDrawTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D72B28F8117300A2E72E /* DefaultDrawTool.swift */; };
+		8668D72E28F82BB700A2E72E /* LassoTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D72D28F82BB700A2E72E /* LassoTool.swift */; };
+		868C5D2728F5992A0064FD18 /* ColorButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868C5D2628F5992A0064FD18 /* ColorButton.swift */; };
 		8699623F28F3602900F3850F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699623E28F3602900F3850F /* AppDelegate.swift */; };
 		8699624128F3602900F3850F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699624028F3602900F3850F /* SceneDelegate.swift */; };
 		8699624328F3602900F3850F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699624228F3602900F3850F /* ViewController.swift */; };
 		8699624828F3602B00F3850F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8699624728F3602B00F3850F /* Assets.xcassets */; };
 		8699624B28F3602B00F3850F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8699624928F3602B00F3850F /* LaunchScreen.storyboard */; };
 		8699625328F3611C00F3850F /* EditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699625228F3611C00F3850F /* EditorViewController.swift */; };
-		8699625728F361FB00F3850F /* Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699625628F361FB00F3850F /* Canvas.swift */; };
-		8699625928F3634700F3850F /* imageShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8699625828F3634700F3850F /* imageShader.metal */; };
-		8699625C28F364B400F3850F /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699625B28F364B400F3850F /* Project.swift */; };
 		8699625E28F36BBD00F3850F /* MetalContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699625D28F36BBD00F3850F /* MetalContext.swift */; };
 		8699626128F36E1D00F3850F /* CGPoint+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699626028F36E1D00F3850F /* CGPoint+Extensions.swift */; };
 		8699626328F378B600F3850F /* EditorNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699626228F378B600F3850F /* EditorNavigationBar.swift */; };
+		8699626628F4188900F3850F /* ToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699626528F4188900F3850F /* ToolBar.swift */; };
+		8699626828F418CA00F3850F /* UIImage+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699626728F418CA00F3850F /* UIImage+Extensions.swift */; };
+		86A4817028F8992C00207D58 /* GalleryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4816F28F8992C00207D58 /* GalleryController.swift */; };
+		86A4817228F899D900207D58 /* GalleryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4817128F899D900207D58 /* GalleryCell.swift */; };
+		86A4817628F89E8700207D58 /* HeroTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4817528F89E8700207D58 /* HeroTransitioningDelegate.swift */; };
+		86A4817828F89EBE00207D58 /* HeroAppearAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4817728F89EBE00207D58 /* HeroAppearAnimation.swift */; };
+		86A4817A28F8BFF800207D58 /* HeroDisappearAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4817928F8BFF800207D58 /* HeroDisappearAnimation.swift */; };
+		86A4817C28F951F200207D58 /* GalleryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4817B28F951F200207D58 /* GalleryLayout.swift */; };
+		86A4817E28F9588B00207D58 /* UIVisualEffect+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4817D28F9588B00207D58 /* UIVisualEffect+Extensions.swift */; };
+		86B0783928FC652800B4EB3F /* CGRect+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B0783828FC652800B4EB3F /* CGRect+Extensions.swift */; };
+		86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3428FB2BA4006819F5 /* Interpolation.swift */; };
+		86EA1A3728FB4254006819F5 /* CollectionTransitionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */; };
+		86EA1A3928FC51C0006819F5 /* CGSize+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3828FC51C0006819F5 /* CGSize+Extensions.swift */; };
+		ED4ED77D01397E427E3E3EE4 /* Pods_PhotoArt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34E52F59859C888902F45C0D /* Pods_PhotoArt.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1F25F0C493D7197053E34138 /* Pods-PhotoArt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoArt.debug.xcconfig"; path = "Target Support Files/Pods-PhotoArt/Pods-PhotoArt.debug.xcconfig"; sourceTree = "<group>"; };
+		2BAD913032522E57EF9FE9E4 /* Pods-PhotoArt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoArt.release.xcconfig"; path = "Target Support Files/Pods-PhotoArt/Pods-PhotoArt.release.xcconfig"; sourceTree = "<group>"; };
+		34E52F59859C888902F45C0D /* Pods_PhotoArt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoArt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		863793BB28F9776800C64A82 /* AccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessController.swift; sourceTree = "<group>"; };
+		863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessTransitioningDelegate.swift; sourceTree = "<group>"; };
+		863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessDisappearAnimation.swift; sourceTree = "<group>"; };
+		8668D71828F73BAC00A2E72E /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		8668D71A28F751B300A2E72E /* Switcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Switcher.swift; sourceTree = "<group>"; };
+		8668D71D28F7592400A2E72E /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
+		8668D71F28F75ADB00A2E72E /* PencilTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PencilTool.swift; sourceTree = "<group>"; };
+		8668D72328F7722E00A2E72E /* BrushTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrushTool.swift; sourceTree = "<group>"; };
+		8668D72528F7735400A2E72E /* PenTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PenTool.swift; sourceTree = "<group>"; };
+		8668D72728F77B0F00A2E72E /* EraseTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EraseTool.swift; sourceTree = "<group>"; };
+		8668D72928F8106100A2E72E /* DefaultTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTool.swift; sourceTree = "<group>"; };
+		8668D72B28F8117300A2E72E /* DefaultDrawTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDrawTool.swift; sourceTree = "<group>"; };
+		8668D72D28F82BB700A2E72E /* LassoTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LassoTool.swift; sourceTree = "<group>"; };
+		868C5D2628F5992A0064FD18 /* ColorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorButton.swift; sourceTree = "<group>"; };
 		8699623B28F3602900F3850F /* PhotoArt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoArt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8699623E28F3602900F3850F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8699624028F3602900F3850F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -30,12 +72,22 @@
 		8699624A28F3602B00F3850F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8699624C28F3602B00F3850F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8699625228F3611C00F3850F /* EditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewController.swift; sourceTree = "<group>"; };
-		8699625628F361FB00F3850F /* Canvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Canvas.swift; sourceTree = "<group>"; };
-		8699625828F3634700F3850F /* imageShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = imageShader.metal; sourceTree = "<group>"; };
-		8699625B28F364B400F3850F /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		8699625D28F36BBD00F3850F /* MetalContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalContext.swift; sourceTree = "<group>"; };
 		8699626028F36E1D00F3850F /* CGPoint+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extensions.swift"; sourceTree = "<group>"; };
 		8699626228F378B600F3850F /* EditorNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorNavigationBar.swift; sourceTree = "<group>"; };
+		8699626528F4188900F3850F /* ToolBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolBar.swift; sourceTree = "<group>"; };
+		8699626728F418CA00F3850F /* UIImage+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extensions.swift"; sourceTree = "<group>"; };
+		86A4816F28F8992C00207D58 /* GalleryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryController.swift; sourceTree = "<group>"; };
+		86A4817128F899D900207D58 /* GalleryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryCell.swift; sourceTree = "<group>"; };
+		86A4817528F89E8700207D58 /* HeroTransitioningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroTransitioningDelegate.swift; sourceTree = "<group>"; };
+		86A4817728F89EBE00207D58 /* HeroAppearAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroAppearAnimation.swift; sourceTree = "<group>"; };
+		86A4817928F8BFF800207D58 /* HeroDisappearAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroDisappearAnimation.swift; sourceTree = "<group>"; };
+		86A4817B28F951F200207D58 /* GalleryLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryLayout.swift; sourceTree = "<group>"; };
+		86A4817D28F9588B00207D58 /* UIVisualEffect+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIVisualEffect+Extensions.swift"; sourceTree = "<group>"; };
+		86B0783828FC652800B4EB3F /* CGRect+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+Extensions.swift"; sourceTree = "<group>"; };
+		86EA1A3428FB2BA4006819F5 /* Interpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interpolation.swift; sourceTree = "<group>"; };
+		86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTransitionController.swift; sourceTree = "<group>"; };
+		86EA1A3828FC51C0006819F5 /* CGSize+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGSize+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,17 +95,53 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED4ED77D01397E427E3E3EE4 /* Pods_PhotoArt.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		863793BD28F978DE00C64A82 /* Access Animations */ = {
+			isa = PBXGroup;
+			children = (
+				863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */,
+				863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */,
+			);
+			name = "Access Animations";
+			sourceTree = "<group>";
+		};
+		863793C228F97AE200C64A82 /* Access */ = {
+			isa = PBXGroup;
+			children = (
+				863793BB28F9776800C64A82 /* AccessController.swift */,
+				863793BD28F978DE00C64A82 /* Access Animations */,
+			);
+			name = Access;
+			sourceTree = "<group>";
+		};
+		8668D71C28F7591C00A2E72E /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				8668D71D28F7592400A2E72E /* Tool.swift */,
+				8668D72928F8106100A2E72E /* DefaultTool.swift */,
+				8668D72B28F8117300A2E72E /* DefaultDrawTool.swift */,
+				8668D71F28F75ADB00A2E72E /* PencilTool.swift */,
+				8668D72328F7722E00A2E72E /* BrushTool.swift */,
+				8668D72528F7735400A2E72E /* PenTool.swift */,
+				8668D72728F77B0F00A2E72E /* EraseTool.swift */,
+				8668D72D28F82BB700A2E72E /* LassoTool.swift */,
+			);
+			name = Tool;
+			sourceTree = "<group>";
+		};
 		8699623228F3602900F3850F = {
 			isa = PBXGroup;
 			children = (
 				8699623D28F3602900F3850F /* PhotoArt */,
 				8699623C28F3602900F3850F /* Products */,
+				900C3E6A7A905EC53CF955F7 /* Pods */,
+				E4F96DDBF24F58C1882AF33A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -68,8 +156,9 @@
 		8699623D28F3602900F3850F /* PhotoArt */ = {
 			isa = PBXGroup;
 			children = (
+				863793C228F97AE200C64A82 /* Access */,
+				86A4817328F89A7200207D58 /* Gallery */,
 				8699625F28F36E1100F3850F /* Extensions */,
-				8699625A28F364A500F3850F /* Models */,
 				8699625428F3612A00F3850F /* Editor */,
 				8699623E28F3602900F3850F /* AppDelegate.swift */,
 				8699624028F3602900F3850F /* SceneDelegate.swift */,
@@ -85,36 +174,75 @@
 		8699625428F3612A00F3850F /* Editor */ = {
 			isa = PBXGroup;
 			children = (
-				8699625528F361F100F3850F /* Canvas */,
+				8699626428F4187F00F3850F /* ToolBar */,
 				8699625228F3611C00F3850F /* EditorViewController.swift */,
 				8699626228F378B600F3850F /* EditorNavigationBar.swift */,
 			);
 			name = Editor;
 			sourceTree = "<group>";
 		};
-		8699625528F361F100F3850F /* Canvas */ = {
-			isa = PBXGroup;
-			children = (
-				8699625628F361FB00F3850F /* Canvas.swift */,
-				8699625828F3634700F3850F /* imageShader.metal */,
-			);
-			name = Canvas;
-			sourceTree = "<group>";
-		};
-		8699625A28F364A500F3850F /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				8699625B28F364B400F3850F /* Project.swift */,
-			);
-			name = Models;
-			sourceTree = "<group>";
-		};
 		8699625F28F36E1100F3850F /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
 				8699626028F36E1D00F3850F /* CGPoint+Extensions.swift */,
+				8699626728F418CA00F3850F /* UIImage+Extensions.swift */,
+				8668D71828F73BAC00A2E72E /* UIColor+Extensions.swift */,
+				86A4817D28F9588B00207D58 /* UIVisualEffect+Extensions.swift */,
+				86EA1A3428FB2BA4006819F5 /* Interpolation.swift */,
+				86EA1A3828FC51C0006819F5 /* CGSize+Extensions.swift */,
+				86B0783828FC652800B4EB3F /* CGRect+Extensions.swift */,
 			);
 			name = Extensions;
+			sourceTree = "<group>";
+		};
+		8699626428F4187F00F3850F /* ToolBar */ = {
+			isa = PBXGroup;
+			children = (
+				8668D71C28F7591C00A2E72E /* Tool */,
+				8699626528F4188900F3850F /* ToolBar.swift */,
+				868C5D2628F5992A0064FD18 /* ColorButton.swift */,
+				8668D71A28F751B300A2E72E /* Switcher.swift */,
+			);
+			name = ToolBar;
+			sourceTree = "<group>";
+		};
+		86A4817328F89A7200207D58 /* Gallery */ = {
+			isa = PBXGroup;
+			children = (
+				86A4816F28F8992C00207D58 /* GalleryController.swift */,
+				86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */,
+				86A4817B28F951F200207D58 /* GalleryLayout.swift */,
+				86A4817428F89E6600207D58 /* Editor Animations */,
+				86A4817128F899D900207D58 /* GalleryCell.swift */,
+			);
+			name = Gallery;
+			sourceTree = "<group>";
+		};
+		86A4817428F89E6600207D58 /* Editor Animations */ = {
+			isa = PBXGroup;
+			children = (
+				86A4817528F89E8700207D58 /* HeroTransitioningDelegate.swift */,
+				86A4817728F89EBE00207D58 /* HeroAppearAnimation.swift */,
+				86A4817928F8BFF800207D58 /* HeroDisappearAnimation.swift */,
+			);
+			name = "Editor Animations";
+			sourceTree = "<group>";
+		};
+		900C3E6A7A905EC53CF955F7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1F25F0C493D7197053E34138 /* Pods-PhotoArt.debug.xcconfig */,
+				2BAD913032522E57EF9FE9E4 /* Pods-PhotoArt.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		E4F96DDBF24F58C1882AF33A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				34E52F59859C888902F45C0D /* Pods_PhotoArt.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -124,9 +252,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8699624F28F3602B00F3850F /* Build configuration list for PBXNativeTarget "PhotoArt" */;
 			buildPhases = (
+				C462F9E60F496BB6D3635060 /* [CP] Check Pods Manifest.lock */,
 				8699623728F3602900F3850F /* Sources */,
 				8699623828F3602900F3850F /* Frameworks */,
 				8699623928F3602900F3850F /* Resources */,
+				46562856894B869D8441A827 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -182,21 +312,87 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		46562856894B869D8441A827 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PhotoArt/Pods-PhotoArt-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PhotoArt/Pods-PhotoArt-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PhotoArt/Pods-PhotoArt-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C462F9E60F496BB6D3635060 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PhotoArt-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		8699623728F3602900F3850F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				863793C128F9790E00C64A82 /* AccessDisappearAnimation.swift in Sources */,
+				8668D72028F75ADB00A2E72E /* PencilTool.swift in Sources */,
 				8699624328F3602900F3850F /* ViewController.swift in Sources */,
+				86A4817228F899D900207D58 /* GalleryCell.swift in Sources */,
+				86EA1A3928FC51C0006819F5 /* CGSize+Extensions.swift in Sources */,
+				86A4817E28F9588B00207D58 /* UIVisualEffect+Extensions.swift in Sources */,
 				8699623F28F3602900F3850F /* AppDelegate.swift in Sources */,
+				8668D72A28F8106100A2E72E /* DefaultTool.swift in Sources */,
+				8668D71E28F7592400A2E72E /* Tool.swift in Sources */,
+				8668D72C28F8117300A2E72E /* DefaultDrawTool.swift in Sources */,
+				868C5D2728F5992A0064FD18 /* ColorButton.swift in Sources */,
+				86A4817C28F951F200207D58 /* GalleryLayout.swift in Sources */,
+				8668D72828F77B0F00A2E72E /* EraseTool.swift in Sources */,
+				86EA1A3728FB4254006819F5 /* CollectionTransitionController.swift in Sources */,
+				863793BF28F978F200C64A82 /* AccessTransitioningDelegate.swift in Sources */,
 				8699624128F3602900F3850F /* SceneDelegate.swift in Sources */,
-				8699625728F361FB00F3850F /* Canvas.swift in Sources */,
+				8699626828F418CA00F3850F /* UIImage+Extensions.swift in Sources */,
+				8668D72E28F82BB700A2E72E /* LassoTool.swift in Sources */,
+				8668D72628F7735400A2E72E /* PenTool.swift in Sources */,
+				86B0783928FC652800B4EB3F /* CGRect+Extensions.swift in Sources */,
 				8699626328F378B600F3850F /* EditorNavigationBar.swift in Sources */,
+				86A4817628F89E8700207D58 /* HeroTransitioningDelegate.swift in Sources */,
+				8668D71928F73BAD00A2E72E /* UIColor+Extensions.swift in Sources */,
+				8668D72428F7722E00A2E72E /* BrushTool.swift in Sources */,
+				86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */,
+				863793BC28F9776800C64A82 /* AccessController.swift in Sources */,
+				86A4817028F8992C00207D58 /* GalleryController.swift in Sources */,
 				8699626128F36E1D00F3850F /* CGPoint+Extensions.swift in Sources */,
-				8699625928F3634700F3850F /* imageShader.metal in Sources */,
+				86A4817828F89EBE00207D58 /* HeroAppearAnimation.swift in Sources */,
+				8668D71B28F751B300A2E72E /* Switcher.swift in Sources */,
 				8699625E28F36BBD00F3850F /* MetalContext.swift in Sources */,
-				8699625C28F364B400F3850F /* Project.swift in Sources */,
 				8699625328F3611C00F3850F /* EditorViewController.swift in Sources */,
+				8699626628F4188900F3850F /* ToolBar.swift in Sources */,
+				86A4817A28F8BFF800207D58 /* HeroDisappearAnimation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,7 +460,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -318,7 +514,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -330,6 +526,7 @@
 		};
 		8699625028F3602B00F3850F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1F25F0C493D7197053E34138 /* Pods-PhotoArt.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -338,11 +535,13 @@
 				DEVELOPMENT_TEAM = G7668ALM57;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PhotoArt/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Need photos";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -358,6 +557,7 @@
 		};
 		8699625128F3602B00F3850F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2BAD913032522E57EF9FE9E4 /* Pods-PhotoArt.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -366,11 +566,13 @@
 				DEVELOPMENT_TEAM = G7668ALM57;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PhotoArt/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Need photos";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
