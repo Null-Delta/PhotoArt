@@ -31,7 +31,7 @@ class CollectionTransitionController {
 
     var progress: CGFloat = 0 {
         didSet {
-            fromCollection.alpha = Interpolator.rangeValue(from: 1, to: 0, progress: progress)
+            //fromCollection.alpha = Interpolator.rangeValue(from: 1, to: 0, progress: progress)
             toCollection.alpha = Interpolator.rangeValue(from: 0, to: 1, progress: progress)
 
             fromLayout.scale = Interpolator.rangeValue(from: 1, to: cellScaling, progress: progress)
@@ -44,7 +44,7 @@ class CollectionTransitionController {
         }
     }
 
-    init(from: UICollectionView, to: UICollectionView, cell: Int, scaling: CGFloat) {
+    init(from: UICollectionView, to: UICollectionView, cell: Int) {
         self.fromCollection = from
         self.toCollection = to
 
@@ -52,7 +52,7 @@ class CollectionTransitionController {
         self.toLayout = toCollection.collectionViewLayout as! GalleryLayout
 
         self.cellIndex = cell - fromLayout.itemsOffset
-        self.cellScaling = scaling
+        self.cellScaling = CGFloat(fromLayout.countOfColumns) / CGFloat(toLayout.countOfColumns)
 
         print(cellIndex)
 

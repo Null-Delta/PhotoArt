@@ -46,8 +46,8 @@ class GalleryController: UIViewController {
     }()
 
     private var layout3 = GalleryLayout(countOfColumns: 3)
-    private var layout5 = GalleryLayout(countOfColumns: 3)
-    private var layout9 = GalleryLayout(countOfColumns: 5)
+    private var layout5 = GalleryLayout(countOfColumns: 5)
+    private var layout9 = GalleryLayout(countOfColumns: 9)
 
     private var transitionProgress = 0.0
 
@@ -86,18 +86,22 @@ class GalleryController: UIViewController {
                 cellIndex = collection9.indexPathForItem(at: pinchGesture.location(in: collection9))!
                 collection5.isHidden = false
                 collection5.alpha = 0
+                collection9.alpha = 1
+                view.bringSubviewToFront(collection5)
 
             } else {
                 cellIndex = collection5.indexPathForItem(at: pinchGesture.location(in: collection5))!
                 collection9.isHidden = false
                 collection9.alpha = 0
+                collection5.alpha = 1
+                view.bringSubviewToFront(collection9)
             }
 
             if current == 9 {
-                transition = CollectionTransitionController(from: collection9, to: collection5, cell: cellIndex.item, scaling: 1.6666)
+                transition = CollectionTransitionController(from: collection9, to: collection5, cell: cellIndex.item)
                 current = 5
             } else {
-                transition = CollectionTransitionController(from: collection5, to: collection9, cell: cellIndex.item, scaling: 0.6)
+                transition = CollectionTransitionController(from: collection5, to: collection9, cell: cellIndex.item)
 
                 current = 9
             }
@@ -194,8 +198,6 @@ extension GalleryController: UICollectionViewDelegate {
             indexPath.item - layout.itemsOffset >= 0
         else { return }
 
-        cell.isLoadingImage = true
-
         DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
             let requestOptions = PHImageRequestOptions()
             requestOptions.isSynchronous = true
@@ -208,7 +210,6 @@ extension GalleryController: UICollectionViewDelegate {
                 options: requestOptions
             ) { [weak self] (image, _) -> Void in
                 DispatchQueue.main.async {
-                    cell.isLoadingImage = false
                     cell.image = image
                     self!.heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: self!.view))
 
@@ -236,17 +237,19 @@ extension GalleryController: UICollectionViewDataSource {
         else { return UICollectionViewCell() }
 
         let cell: GalleryCell
+        let imageSize: CGSize
 
         if collectionView === collection9 {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photo", for: indexPath) as! GalleryCell
+            imageSize =  CGSize(width: layout9.cellSize, height: layout9.cellSize)
             cell.bordered = false
         } else {
             cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photo2", for: indexPath) as! GalleryCell
+            imageSize =  CGSize(width: layout5.cellSize, height: layout5.cellSize)
             cell.bordered = true
         }
 
         cell.image = nil
-        cell.isLoadingImage = false
 
         guard
             indexPath.item - layout.itemsOffset >= 0
@@ -261,7 +264,7 @@ extension GalleryController: UICollectionViewDataSource {
 
             PHImageManager.default().requestImage(
                 for: assets.object(at: indexPath.item - layout.itemsOffset),
-                targetSize: CGSize(width: 128, height: 128),
+                targetSize: imageSize,
                 contentMode: .aspectFill,
                 options: options
             ) { (image, _) -> Void in
