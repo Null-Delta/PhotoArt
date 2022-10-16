@@ -9,15 +9,13 @@ import UIKit
 
 class GalleryLayout: UICollectionViewLayout {
 
-    private var cellSize: CGFloat = 0
-
-    var offset: CGFloat = 0.0 {
+    var cellSize: CGFloat = 32 {
         didSet {
             invalidateLayout()
         }
     }
 
-    var scale: CGFloat = 1.0 {
+    var offset: CGFloat = 0.0 {
         didSet {
             invalidateLayout()
         }
@@ -37,7 +35,7 @@ class GalleryLayout: UICollectionViewLayout {
 
     private var attributes: [UICollectionViewLayoutAttributes] = []
 
-    private func binarySearch(rect: CGRect) -> Int {
+    private func binarySearch(rect: CGRect, step: Int? = nil, position: Int = 0) -> Int {
         var left = 0
         var right = attributes.count + itemsOffset - 1
 
@@ -59,8 +57,8 @@ class GalleryLayout: UICollectionViewLayout {
 
     private func fullFrame(at: Int) -> CGRect {
         return CGRect(
-            origin: attributes[at].frame.origin * cellSize * scale + CGPoint(x: offset, y: 0),
-            size: attributes[at].size * cellSize * scale
+            origin: attributes[at].frame.origin * cellSize + CGPoint(x: offset, y: 0),
+            size: attributes[at].size * cellSize
         )
     }
 
@@ -71,7 +69,7 @@ class GalleryLayout: UICollectionViewLayout {
     }
 
     override var collectionViewContentSize: CGSize {
-        return CGSize(width: collectionView!.frame.width, height: ceil(CGFloat(countOfItems + itemsOffset) / CGFloat(countOfColumns)) * cellSize * scale)
+        return CGSize(width: collectionView!.frame.width, height: ceil(CGFloat(countOfItems + itemsOffset) / CGFloat(countOfColumns)) * cellSize)
     }
 
     init(countOfColumns: Int) {
@@ -81,8 +79,6 @@ class GalleryLayout: UICollectionViewLayout {
 
     override func prepare() {
         guard needRecalculate else { return }
-
-        cellSize = collectionView!.bounds.width / CGFloat(countOfColumns)
 
         attributes.removeAll()
         needRecalculate = false
@@ -107,6 +103,14 @@ class GalleryLayout: UICollectionViewLayout {
     }
 
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+//        return attributes.filter { attr in
+//            rect.intersects(CGRect(origin: attr.frame.origin * cellSize + CGPoint(x: offset, y: 0), size: attr.frame.size * cellSize))
+//        }.map { attr in
+//            let attr2 = UICollectionViewLayoutAttributes(forCellWith: attr.indexPath)
+//            attr2.frame = CGRect(origin: attr.frame.origin * cellSize + CGPoint(x: offset, y: 0), size: attr.frame.size * cellSize)
+//            return attr2
+//        }
+
         var visibleAttributes: [UICollectionViewLayoutAttributes] = []
 
         let firstItem = binarySearch(rect: rect)
@@ -141,8 +145,6 @@ class GalleryLayout: UICollectionViewLayout {
     }
 
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        let attr = UICollectionViewLayoutAttributes(forCellWith: indexPath)
-        attr.frame = fullFrame(at: indexPath.item)
-        return attr
+        return attributes[indexPath.item]
     }
 }
