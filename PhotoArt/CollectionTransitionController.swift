@@ -54,22 +54,12 @@ class CollectionTransitionController {
         self.cellIndex = cell - fromLayout.itemsOffset
         self.cellScaling = CGFloat(fromLayout.countOfColumns) / CGFloat(toLayout.countOfColumns)
 
-        print(cellIndex)
-
         // replace cell to center of collection's row
         toLayout.itemsOffset = (toLayout.countOfColumns / 2 - (cellIndex % toLayout.countOfColumns))
         if toLayout.itemsOffset < 0 {
             print("aaa")
             toLayout.itemsOffset = toLayout.countOfColumns + toLayout.itemsOffset
         }
-
-        toCollection.reloadData()
-
-        print(cellIndex)
-        print(toLayout.itemsOffset)
-        print(fromLayout.itemsOffset)
-
-
         // set cell size like in "from" collection
         toLayout.scale = 1 / cellScaling
         toCollection.contentOffset.y = 0
@@ -93,12 +83,12 @@ class CollectionTransitionController {
 
         fromLayoutYOffsetInterpolator = Interpolator(
             from: fromCollection.contentOffset.y,
-            to: -(fromCollection.superview!.bounds.height / 2 - (fromCellCenter.y + fromCollection.contentOffset.y) * cellScaling)
+            to: -(fromCellCenter.y - (fromCellCenter.y + fromCollection.contentOffset.y) * cellScaling)
         )
 
         toLayoutYOffsetInterpolator = Interpolator(
             from: toCollection.contentOffset.y,
-            to: -(toCollection.superview!.bounds.height / 2 - (toCellCenter.y) * cellScaling)
+            to: -(fromCellCenter.y - (toCellCenter.y) * cellScaling)
         )
     }
 }

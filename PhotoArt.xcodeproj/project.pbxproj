@@ -40,6 +40,7 @@
 		86A4817C28F951F200207D58 /* GalleryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4817B28F951F200207D58 /* GalleryLayout.swift */; };
 		86A4817E28F9588B00207D58 /* UIVisualEffect+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86A4817D28F9588B00207D58 /* UIVisualEffect+Extensions.swift */; };
 		86B0783928FC652800B4EB3F /* CGRect+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B0783828FC652800B4EB3F /* CGRect+Extensions.swift */; };
+		86B0783B28FC7E9A00B4EB3F /* ValueAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B0783A28FC7E9A00B4EB3F /* ValueAnimator.swift */; };
 		86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3428FB2BA4006819F5 /* Interpolation.swift */; };
 		86EA1A3728FB4254006819F5 /* CollectionTransitionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */; };
 		86EA1A3928FC51C0006819F5 /* CGSize+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3828FC51C0006819F5 /* CGSize+Extensions.swift */; };
@@ -85,6 +86,7 @@
 		86A4817B28F951F200207D58 /* GalleryLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryLayout.swift; sourceTree = "<group>"; };
 		86A4817D28F9588B00207D58 /* UIVisualEffect+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIVisualEffect+Extensions.swift"; sourceTree = "<group>"; };
 		86B0783828FC652800B4EB3F /* CGRect+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+Extensions.swift"; sourceTree = "<group>"; };
+		86B0783A28FC7E9A00B4EB3F /* ValueAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueAnimator.swift; sourceTree = "<group>"; };
 		86EA1A3428FB2BA4006819F5 /* Interpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interpolation.swift; sourceTree = "<group>"; };
 		86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTransitionController.swift; sourceTree = "<group>"; };
 		86EA1A3828FC51C0006819F5 /* CGSize+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGSize+Extensions.swift"; sourceTree = "<group>"; };
@@ -156,6 +158,7 @@
 		8699623D28F3602900F3850F /* PhotoArt */ = {
 			isa = PBXGroup;
 			children = (
+				86B0783C28FC8B3500B4EB3F /* Animator */,
 				863793C228F97AE200C64A82 /* Access */,
 				86A4817328F89A7200207D58 /* Gallery */,
 				8699625F28F36E1100F3850F /* Extensions */,
@@ -226,6 +229,14 @@
 				86A4817928F8BFF800207D58 /* HeroDisappearAnimation.swift */,
 			);
 			name = "Editor Animations";
+			sourceTree = "<group>";
+		};
+		86B0783C28FC8B3500B4EB3F /* Animator */ = {
+			isa = PBXGroup;
+			children = (
+				86B0783A28FC7E9A00B4EB3F /* ValueAnimator.swift */,
+			);
+			name = Animator;
 			sourceTree = "<group>";
 		};
 		900C3E6A7A905EC53CF955F7 /* Pods */ = {
@@ -384,6 +395,7 @@
 				8668D71928F73BAD00A2E72E /* UIColor+Extensions.swift in Sources */,
 				8668D72428F7722E00A2E72E /* BrushTool.swift in Sources */,
 				86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */,
+				86B0783B28FC7E9A00B4EB3F /* ValueAnimator.swift in Sources */,
 				863793BC28F9776800C64A82 /* AccessController.swift in Sources */,
 				86A4817028F8992C00207D58 /* GalleryController.swift in Sources */,
 				8699626128F36E1D00F3850F /* CGPoint+Extensions.swift in Sources */,

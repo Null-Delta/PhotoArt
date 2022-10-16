@@ -14,6 +14,7 @@ class GalleryController: UIViewController {
     private var accessTransitionDelegate = AccessTransitioningDelegate()
 
     private var assets: PHFetchResult<PHAsset>!
+    private var manager: PHCachingImageManager = PHCachingImageManager()
 
     lazy private var collection9: UICollectionView = {
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout9)
@@ -46,11 +47,11 @@ class GalleryController: UIViewController {
     }()
 
     private var layout3 = GalleryLayout(countOfColumns: 3)
-    private var layout5 = GalleryLayout(countOfColumns: 5)
+    private var layout5 = GalleryLayout(countOfColumns: 3)
     private var layout9 = GalleryLayout(countOfColumns: 9)
 
-    private var transitionProgress = 0.0
-
+    private var animator: ValueAnimator? = nil
+    
     lazy private var blurView: UIView = {
         let blur = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
         blur.translatesAutoresizingMaskIntoConstraints = false
@@ -81,29 +82,34 @@ class GalleryController: UIViewController {
 
         switch pinchGesture.state {
         case .began:
-            let cellIndex: IndexPath
-            if current == 9 {
-                cellIndex = collection9.indexPathForItem(at: pinchGesture.location(in: collection9))!
-                collection5.isHidden = false
-                collection5.alpha = 0
-                collection9.alpha = 1
-                view.bringSubviewToFront(collection5)
+            if animator == nil {
+                let cellIndex: IndexPath
+                if current == 9 {
+                    cellIndex = collection9.indexPathForItem(at: pinchGesture.location(in: collection9))!
+                    collection5.isHidden = false
+                    collection5.alpha = 0
+                    collection9.alpha = 1
+                    view.bringSubviewToFront(collection5)
 
+                } else {
+                    cellIndex = collection5.indexPathForItem(at: pinchGesture.location(in: collection5))!
+                    collection9.isHidden = false
+                    collection9.alpha = 0
+                    collection5.alpha = 1
+                    view.bringSubviewToFront(collection9)
+                }
+
+                if current == 9 {
+                    transition = CollectionTransitionController(from: collection9, to: collection5, cell: cellIndex.item)
+                    current = 5
+                } else {
+                    transition = CollectionTransitionController(from: collection5, to: collection9, cell: cellIndex.item)
+
+                    current = 9
+                }
             } else {
-                cellIndex = collection5.indexPathForItem(at: pinchGesture.location(in: collection5))!
-                collection9.isHidden = false
-                collection9.alpha = 0
-                collection5.alpha = 1
-                view.bringSubviewToFront(collection9)
-            }
-
-            if current == 9 {
-                transition = CollectionTransitionController(from: collection9, to: collection5, cell: cellIndex.item)
-                current = 5
-            } else {
-                transition = CollectionTransitionController(from: collection5, to: collection9, cell: cellIndex.item)
-
-                current = 9
+                animator?.stop()
+                pinchGesture.scale = 1 + transition.progress
             }
 
         case .changed:
@@ -111,17 +117,64 @@ class GalleryController: UIViewController {
 
             break
         case .ended:
-            transition.progress = 1
-            if current == 5 {
-                collection9.removeGestureRecognizer(pinchGesture)
-                collection5.addGestureRecognizer(pinchGesture)
-            } else {
-                collection5.removeGestureRecognizer(pinchGesture)
-                collection9.addGestureRecognizer(pinchGesture)
+            let startProgress = transition.progress
+            let delayProgress =  startProgress > 0.1 ? 1 - startProgress : -startProgress
 
-            }
+            animator = ValueAnimator(duration: 0.75, animation: { progress in
+                self.transition.progress = startProgress + delayProgress * progress
+            }, curve: { x in
+                let c4 = (2.0 * CGFloat.pi) / 3.0;
 
-            break
+                return x == 0 ? 0 : x == 1 ? 1
+                  : pow(2, -10 * x) * sin((x - 0.75) * c4) + 1
+
+            }, complition: { [unowned self] isComplete in
+                if transition.progress == 1 {
+
+                } else {
+                    if current == 5 {
+                        current = 9
+                        view.bringSubviewToFront(collection9)
+                    } else {
+                        current = 5
+                        view.bringSubviewToFront(collection5)
+                    }
+                }
+
+                if isComplete {
+                    animator = nil
+                } else {
+                    if current == 9 {
+                        current = 5
+                    } else {
+                        current = 9
+                    }
+                }
+            })
+
+            animator?.start()
+
+//            UIView.transition(with: collection9, duration: 10, animations: {
+//                self.transition.progress = 1
+//            })
+
+//            let anim = UIViewPropertyAnimator(duration: 0.5, curve: .easeIn)
+//
+//            anim.addAnimations {
+//                self.transition.progress = 1
+//            }
+//
+//            anim.startAnimation()
+
+//            anim.startAnimation()
+//            UIView.animate(withDuration: 3, animations: {
+//                self.transition.progress = 1
+//            }, completion: { [unowned self] _ in
+//
+//            })
+
+            //transition.progress = 1
+
         default:
             break
         }
@@ -152,7 +205,7 @@ class GalleryController: UIViewController {
         view.addSubview(collection5)
         view.addSubview(blurView)
 
-        collection9.addGestureRecognizer(pinchGesture)
+        view.addGestureRecognizer(pinchGesture)
 
         collection5.isHidden = true
 
@@ -203,7 +256,7 @@ extension GalleryController: UICollectionViewDelegate {
             requestOptions.isSynchronous = true
             requestOptions.isNetworkAccessAllowed = true
 
-            PHImageManager.default().requestImage(
+            manager.requestImage(
                 for: assets.object(at: indexPath.item - layout.itemsOffset),
                 targetSize: CGSize(width: view.bounds.width * UIScreen.main.scale, height: view.bounds.height * UIScreen.main.scale),
                 contentMode: .aspectFit,
@@ -262,7 +315,7 @@ extension GalleryController: UICollectionViewDataSource {
             options.isSynchronous = true
             options.isNetworkAccessAllowed = true
 
-            PHImageManager.default().requestImage(
+            manager.requestImage(
                 for: assets.object(at: indexPath.item - layout.itemsOffset),
                 targetSize: imageSize,
                 contentMode: .aspectFill,
