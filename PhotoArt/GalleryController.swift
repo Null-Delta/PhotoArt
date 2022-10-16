@@ -73,56 +73,40 @@ class GalleryController: UIViewController {
         return gradient
     }()
 
-    private var unscaledCellSize = 50.0
-
-    private var pinchCenter: CGPoint = .zero
-    private var centerOffset: CGPoint = .zero
-    private var startYOffset: CGFloat = 0.0
-    private var centeredCellIndex: Int = -1
-    private var columnFrom: Int = -1
-    private var columtTo: Int = -1
-    private var rowTo: Int = -1
-
     private var transition: CollectionTransitionController!
 
-    private var scaleProgress = 0.0
     private var current = 9
-    private var isZooming: Bool = false
 
     @objc private func onZoom() {
 
         switch pinchGesture.state {
         case .began:
-            isZooming = true
             let cellIndex: IndexPath
             if current == 9 {
                 cellIndex = collection9.indexPathForItem(at: pinchGesture.location(in: collection9))!
                 collection5.isHidden = false
                 collection5.alpha = 0
-                collection9.alpha = 1
 
             } else {
                 cellIndex = collection5.indexPathForItem(at: pinchGesture.location(in: collection5))!
                 collection9.isHidden = false
                 collection9.alpha = 0
-                collection5.alpha = 1
             }
 
             if current == 9 {
-                transition = CollectionTransitionController(from: collection9, to: collection5, cell: cellIndex.item, scaling: 1.6666, size: layout9.cellSize)
+                transition = CollectionTransitionController(from: collection9, to: collection5, cell: cellIndex.item, scaling: 1.6666)
                 current = 5
             } else {
-                transition = CollectionTransitionController(from: collection5, to: collection9, cell: cellIndex.item, scaling: 0.6, size: layout5.cellSize)
+                transition = CollectionTransitionController(from: collection5, to: collection9, cell: cellIndex.item, scaling: 0.6)
+
                 current = 9
             }
 
         case .changed:
-            isZooming = false
             transition.progress = min(1, max(0, pinchGesture.scale - 1))
 
             break
         case .ended:
-            isZooming = false
             transition.progress = 1
             if current == 5 {
                 collection9.removeGestureRecognizer(pinchGesture)
@@ -143,12 +127,6 @@ class GalleryController: UIViewController {
         super.viewDidLayoutSubviews()
         backgroundMask.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: view.safeAreaInsets.top)
         blurView.layer.mask = backgroundMask
-
-        //layout3.cellSize = view.bounds.width / 3.0
-        layout5.cellSize = view.bounds.width / 3.0
-        layout9.cellSize = view.bounds.width / 5.0
-        unscaledCellSize = layout9.cellSize
-        
     }
 
     override func viewWillAppear(_ animated: Bool) {
