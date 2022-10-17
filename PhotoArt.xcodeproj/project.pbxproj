@@ -218,8 +218,8 @@
 			children = (
 				86B0783F28FD85A200B4EB3F /* GalleryGrid.swift */,
 				86A4816F28F8992C00207D58 /* GalleryController.swift */,
-				86000B3128FD961C00E05B46 /* MultiCollectionTransition.swift */,
 				86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */,
+				86000B3128FD961C00E05B46 /* MultiCollectionTransition.swift */,
 				86A4817B28F951F200207D58 /* GalleryLayout.swift */,
 				86A4817428F89E6600207D58 /* Editor Animations */,
 				86A4817128F899D900207D58 /* GalleryCell.swift */,

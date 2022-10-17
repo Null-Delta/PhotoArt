@@ -153,7 +153,7 @@ extension GalleryController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photo", for: indexPath) as! GalleryCell
 
         let imageSize: CGSize = CGSize(width: layout.cellSize, height: layout.cellSize)
-        cell.bordered = layout.countOfColumns <= 3
+        cell.bordered = layout.countOfColumns <= 5
 
         cell.image = nil
 

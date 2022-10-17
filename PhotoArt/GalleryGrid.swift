@@ -40,38 +40,32 @@ class GalleryGrid: UIView {
         return allCollections[index]
     }
 
+    private func getNextBefore(collection: UICollectionView) -> UICollectionView {
+        let index = allCollections.firstIndex(of: collection)! + 1
+
+        return allCollections[index % allCollections.count]
+    }
+
     private var zoomCellIndex: Int
     private var pinchOffset: CGFloat = 0
 
-    private var zoomScale: CGFloat {
-        get {
-            switch (currentCollection.collectionViewLayout as! GalleryLayout).countOfColumns {
-            case 13:
-                return 13.0 / 5.0
-            case 5:
-                return 5.0 / 3.0
-            case 3:
-                return 3
-            default:
-                return 1
-            }
+    private var isUnscale = false
+    private var wasZoomStarted = false
+
+    private func aaa() {
+        guard
+            !(!isUnscale && signScale > 1 && allCollections.firstIndex(of: currentCollection)! == 1),
+            !(isUnscale && signScale > 0 && allCollections.firstIndex(of: currentCollection)! == 0),
+            !(isUnscale && signScale < -1 && allCollections.firstIndex(of: currentCollection)! == allCollections.count - 2),
+            !(!isUnscale && signScale < 0 && allCollections.firstIndex(of: currentCollection)! == allCollections.count - 1),
+            !(normalizedScale < 0 && allCollections.firstIndex(of: transitionController!.toCollection)! == 3)
+        else {
+            return
         }
-    }
-
-    private var scaledZoom: CGFloat {
-        return (pinchGesture.scale * zoomScale - 1 - pinchOffset)
-    }
-    @objc private func onZoom() {
-        switch pinchGesture.state {
-        case .began:
-            zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
-            let nextCollection = getNextAfter(collection: currentCollection)
-            transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-            transitionController?.progress = 0
-
-        case .changed:
-            print(pinchGesture.scale - 1 - pinchOffset)
-            if (pinchGesture.scale - 1 - pinchOffset > 1) {
+        
+        if !isUnscale {
+            if signScale > 1 {
+                isUnscale = false
                 transitionController?.progress = 1
                 pinchOffset += 1
 
@@ -82,44 +76,142 @@ class GalleryGrid: UIView {
                 self.transitionController = nil
 
                 transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-                transitionController?.progress = pinchGesture.scale - 1 - pinchOffset
-            } else {
-                transitionController?.progress = min(1, max(0, pinchGesture.scale - 1 - pinchOffset))
-            }
+                transitionController?.progress = unsignScale
+            } else if signScale < 0 {
+                isUnscale = true
+                transitionController?.progress = 0
+                pinchOffset -= 1
 
-        case .ended:
-            pinchGesture.isEnabled = false
+                currentCollection = transitionController!.fromCollection
+
+                zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
+                let nextCollection = getNextBefore(collection: currentCollection)
+
+                self.transitionController = nil
+
+                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+                transitionController?.progress = unsignScale
+            } else {
+                transitionController?.progress = min(1, max(0, unsignScale))
+            }
+        } else if isUnscale {
+            if signScale > 0 {
+                isUnscale = false
+                transitionController?.progress = 0
+                pinchOffset += 1
+
+                currentCollection = transitionController!.fromCollection
+                zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
+                let nextCollection = getNextAfter(collection: currentCollection)
+
+                self.transitionController = nil
+
+                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+                transitionController?.progress = unsignScale
+            } else if signScale < -1 {
+                isUnscale = true
+                transitionController?.progress = 1
+                pinchOffset -= 0.5
+
+                currentCollection = transitionController!.toCollection
+
+                zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
+                let nextCollection = getNextBefore(collection: currentCollection)
+
+                self.transitionController = nil
+
+                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+                transitionController?.progress = unsignScale
+            } else {
+                transitionController?.progress = min(1, max(0, unsignScale))
+            }
+        }
+    }
+
+    var normalizedScale: CGFloat {
+        return pinchGesture.scale - 1 - pinchOffset
+    }
+
+    var unsignScale: CGFloat {
+        if !isUnscale {
+            return normalizedScale
+        } else {
+            return 1 / normalizedScale - 1
+        }
+    }
+
+    var signScale: CGFloat {
+        if !isUnscale {
+            return unsignScale
+        } else {
+            return -unsignScale
+        }
+    }
+
+    var normalizedPinch: CGFloat {
+        if pinchGesture.scale > 1 {
+            return pinchGesture.scale
+        } else {
+            return 1 / pinchGesture.scale
+        }
+    }
+
+    @objc private func onZoom() {
+        print(pinchGesture.scale)
+
+        switch pinchGesture.state {
+        case .began:
             pinchOffset = 0
 
-            let d = 0.25
-            var lastScale = ceil(pinchGesture.scale + (pinchGesture.velocity * d) / ((1 - d)))
-            if (lastScale - pinchGesture.scale) > 3 {
-                lastScale -= lastScale - floor(lastScale - pinchGesture.scale)
+            guard
+                !(normalizedScale > 0 && allCollections.firstIndex(of: currentCollection)! == 0),
+                !(normalizedScale < 0 && allCollections.firstIndex(of: currentCollection)! == allCollections.count - 1)
+            else {
+                return
             }
-            let deltaScale = lastScale - pinchGesture.scale
 
-            animator = ValueAnimator(duration: 1, animation: {[unowned self] progress in
-                pinchGesture.scale = lastScale - ((1 - progress) * deltaScale)
-                print(pinchGesture.scale - 1 - pinchOffset)
+            zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
+            let nextCollection: UICollectionView
+            if normalizedScale > 0 {
+                isUnscale = false
+                nextCollection = getNextAfter(collection: currentCollection)
+                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+                transitionController?.progress = unsignScale
+            } else {
+                pinchOffset -= 1
+                isUnscale = true
+                nextCollection = getNextBefore(collection: currentCollection)
+                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+                transitionController?.progress = unsignScale
+            }
+            wasZoomStarted = true
 
-                if (pinchGesture.scale - 1 - pinchOffset > 1) {
-                    self.transitionController!.progress = 1
-                    pinchOffset += 1
 
-                    currentCollection = self.transitionController!.toCollection
+        case .changed:
+            guard wasZoomStarted else { return }
+            aaa()
 
-                    zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
-                    let nextCollection = getNextAfter(collection: currentCollection)
+        case .ended:
+            guard wasZoomStarted else { return }
+            pinchGesture.isEnabled = false
+            wasZoomStarted = false
 
-                    self.transitionController = nil
+//            let velocity = isUnscale ? 0.0 : 0.0
+//            let d = 0.25
 
-                    self.transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-                    self.transitionController?.progress = pinchGesture.scale - 1 - pinchOffset
-                } else {
-                    self.transitionController?.progress = min(1, max(0, pinchGesture.scale - 1 - pinchOffset))
-                }
+//            let lastScale = isUnscale ?
+//            floor(pinchGesture.scale + (velocity * d) / ((1 - d))) :
+//            ceil(pinchGesture.scale + (velocity * d) / ((1 - d)))
+//
+//            let deltaScale = lastScale - pinchGesture.scale
+            let deltaProgress = 1 - self.transitionController!.progress
+
+            animator = ValueAnimator(duration: 0.5, animation: {[unowned self] progress in
+                //pinchGesture.scale = lastScale - ((1 - progress) * deltaScale)
+                self.transitionController?.progress = 1 - deltaProgress * (1 - progress)
+                //aaa()
             }, curve: { x in
-                return 1 - pow(1 - x, 3)
+                return 1  - (1 - x) * (1 - x)
             }, complition: { [unowned self] isComplete in
                 pinchGesture.isEnabled = true
 

@@ -37,7 +37,7 @@ class CollectionTransitionController {
 
     var progress: CGFloat = 0 {
         didSet {
-            fromCollection.alpha = Interpolator.rangeValue(from: 1, to: 0, progress: progress)
+            fromCollection.alpha = progress < 0.5 ? 1 : 1 - (progress - 0.5) * 2
             toCollection.alpha = Interpolator.rangeValue(from: 0, to: 1, progress: progress)
 
             let fromScale = Interpolator.rangeValue(from: 1, to: cellScaling, progress: progress)
@@ -63,9 +63,6 @@ class CollectionTransitionController {
     }
 
     init(from: UICollectionView, to: UICollectionView, cell: Int) {
-        //from.clipsToBounds = false
-        //to.clipsToBounds = false
-
         self.fromCollection = from
         self.toCollection = to
 
@@ -74,6 +71,10 @@ class CollectionTransitionController {
 
         self.cellIndex = cell - fromLayout.itemsOffset
         self.cellScaling = CGFloat(fromLayout.countOfColumns) / CGFloat(toLayout.countOfColumns)
+
+        print(fromLayout.countOfColumns)
+        print(toLayout.countOfColumns)
+        print(cellScaling)
 
         // replace cell to center of collection's row
         toLayout.itemsOffset = (toLayout.countOfColumns / 2 - (cellIndex % toLayout.countOfColumns))
@@ -91,7 +92,6 @@ class CollectionTransitionController {
         fromCellCenter = fromCellAttribute.center - fromCollection.contentOffset
         toCellCenter = toCellAttribute.center - toCollection.contentOffset
 
-        toCollection.alpha = 1
         toCollection.contentOffset.y += (toCellCenter.y - screenCenter.y)
         toCollection.reloadData()
 

@@ -39,7 +39,7 @@ class GalleryCell: UICollectionViewCell {
 
     var bordered: Bool = false {
         didSet {
-            preview.layer.borderWidth = bordered ? 0.5 : 0
+            preview.layer.borderWidth = bordered ? 1 : 0
         }
     }
     
