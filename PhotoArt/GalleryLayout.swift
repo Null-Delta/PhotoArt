@@ -11,18 +11,6 @@ class GalleryLayout: UICollectionViewLayout {
 
     private(set) var cellSize: CGFloat = 0
 
-    var offset: CGFloat = 0.0 {
-        didSet {
-            invalidateLayout()
-        }
-    }
-
-    var scale: CGFloat = 1.0 {
-        didSet {
-            invalidateLayout()
-        }
-    }
-
     var itemsOffset: Int = 0 {
         didSet {
             needRecalculate = true
@@ -43,11 +31,10 @@ class GalleryLayout: UICollectionViewLayout {
 
         while(left != right) {
             let index = (left + right) / 2
-            let attrRect = fullFrame(at: index)
 
-            if rect.intersects(attrRect) {
+            if rect.intersects(attributes[index].frame) {
                 return index
-            } else if attrRect.minY > rect.maxY {
+            } else if attributes[index].frame.minY > rect.maxY {
                 right = index - 1
             } else {
                 left = index + 1
@@ -57,13 +44,6 @@ class GalleryLayout: UICollectionViewLayout {
         return left
     }
 
-    private func fullFrame(at: Int) -> CGRect {
-        return CGRect(
-            origin: attributes[at].frame.origin * cellSize * scale + CGPoint(x: offset, y: 0),
-            size: attributes[at].size * cellSize * scale
-        )
-    }
-
     private func isIn(top: CGFloat, bottom: CGFloat, rect: CGRect) -> Bool {
         rect.minY >= top && rect.minY <= bottom ||
         rect.maxY >= top && rect.maxY <= bottom ||
@@ -71,7 +51,7 @@ class GalleryLayout: UICollectionViewLayout {
     }
 
     override var collectionViewContentSize: CGSize {
-        return CGSize(width: collectionView!.frame.width, height: ceil(CGFloat(countOfItems + itemsOffset) / CGFloat(countOfColumns)) * cellSize * scale)
+        return CGSize(width: collectionView!.frame.width, height: ceil(CGFloat(countOfItems + itemsOffset) / CGFloat(countOfColumns)) * cellSize)
     }
 
     init(countOfColumns: Int) {
@@ -92,10 +72,10 @@ class GalleryLayout: UICollectionViewLayout {
             let attribure = UICollectionViewLayoutAttributes(forCellWith: IndexPath(item: index, section: 0))
 
             attribure.frame = CGRect(
-                x: CGFloat((index % Int(countOfColumns))),
-                y: floor(CGFloat(index) / CGFloat(countOfColumns)),
-                width: 1,
-                height: 1
+                x: CGFloat((index % Int(countOfColumns))) * cellSize,
+                y: floor(CGFloat(index) / CGFloat(countOfColumns)) * cellSize,
+                width: cellSize,
+                height: cellSize
             )
 
             attributes.append(attribure)
@@ -112,26 +92,16 @@ class GalleryLayout: UICollectionViewLayout {
         let firstItem = binarySearch(rect: rect)
 
         for index in firstItem..<attributes.count {
-            let frame = fullFrame(at: index)
-
-            if isIn(top: rect.minY, bottom: rect.maxY, rect: frame) {
-                let attr = UICollectionViewLayoutAttributes(forCellWith: attributes[index].indexPath)
-                attr.frame = frame
-
-                visibleAttributes.append(attr)
+            if isIn(top: rect.minY, bottom: rect.maxY, rect: attributes[index].frame) {
+                visibleAttributes.append(attributes[index])
             } else {
                 break
             }
         }
 
         for index in (0..<firstItem).reversed() {
-            let frame = fullFrame(at: index)
-
-            if isIn(top: rect.minY, bottom: rect.maxY, rect: frame) {
-                let attr = UICollectionViewLayoutAttributes(forCellWith: attributes[index].indexPath)
-                attr.frame = frame
-
-                visibleAttributes.append(attr)
+            if isIn(top: rect.minY, bottom: rect.maxY, rect: attributes[index].frame) {
+                visibleAttributes.append(attributes[index])
             } else {
                 break
             }

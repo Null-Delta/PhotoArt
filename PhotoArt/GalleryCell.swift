@@ -23,7 +23,9 @@ class GalleryCell: UICollectionViewCell {
         }
 
         set {
-            preview.image = newValue
+            UIView.animate(withDuration: 0.25, animations: {
+                self.preview.image = newValue
+            })
         }
     }
 

@@ -9,19 +9,25 @@ import UIKit
 
 class CollectionTransitionController {
     // input params
-    private var fromCollection: UICollectionView
-    private var toCollection: UICollectionView
-    private var fromLayout: GalleryLayout
-    private var toLayout: GalleryLayout
+    private(set) var fromCollection: UICollectionView
+    private(set) var toCollection: UICollectionView
+    private(set) var fromLayout: GalleryLayout
+    private(set) var toLayout: GalleryLayout
+    
     private var cellIndex: Int
     private var cellScaling: CGFloat
 
     // help params
     private var fromCellCenter: CGPoint!
     private var toCellCenter: CGPoint!
+    private var screenSize: CGSize!
+    private var screenCenter: CGPoint!
 
     private var fromOffsetStart: CGFloat!
     private var toOffsetStart: CGFloat!
+
+    private var toScreenOffsetY: CGFloat!
+    private var fromScreenOffsetY: CGFloat!
 
     private var fromLayoutXOffsetInterpolator: Interpolator
     private var toLayoutXOffsetInterpolator: Interpolator
@@ -31,20 +37,35 @@ class CollectionTransitionController {
 
     var progress: CGFloat = 0 {
         didSet {
-            //fromCollection.alpha = Interpolator.rangeValue(from: 1, to: 0, progress: progress)
+            fromCollection.alpha = Interpolator.rangeValue(from: 1, to: 0, progress: progress)
             toCollection.alpha = Interpolator.rangeValue(from: 0, to: 1, progress: progress)
 
-            fromLayout.scale = Interpolator.rangeValue(from: 1, to: cellScaling, progress: progress)
-            fromLayout.offset = fromLayoutXOffsetInterpolator.value(progress: progress)
-            fromCollection.contentOffset.y = fromLayoutYOffsetInterpolator.value(progress: progress)
+            let fromScale = Interpolator.rangeValue(from: 1, to: cellScaling, progress: progress)
 
-            toLayout.scale = Interpolator.rangeValue(from: 1 / cellScaling, to: 1, progress: progress)
-            toLayout.offset = toLayoutXOffsetInterpolator.value(progress: progress)
-            toCollection.contentOffset.y = toLayoutYOffsetInterpolator.value(progress: progress)
+            fromCollection.transform =
+                .init(
+                    translationX: fromLayoutXOffsetInterpolator.value(progress: progress),
+                    y: fromLayoutYOffsetInterpolator.value(progress: progress)
+                )
+                .scaledBy(x: fromScale, y: fromScale)
+            fromCollection.contentOffset.y = fromScreenOffsetY
+
+            let toScale = Interpolator.rangeValue(from: 1 / cellScaling, to: 1, progress: progress)
+
+            toCollection.transform =
+                .init(
+                    translationX: toLayoutXOffsetInterpolator.value(progress: progress),
+                    y: toLayoutYOffsetInterpolator.value(progress: progress)
+                )
+                .scaledBy(x: toScale, y: toScale)
+            toCollection.contentOffset.y = toScreenOffsetY
         }
     }
 
     init(from: UICollectionView, to: UICollectionView, cell: Int) {
+        //from.clipsToBounds = false
+        //to.clipsToBounds = false
+
         self.fromCollection = from
         self.toCollection = to
 
@@ -57,38 +78,44 @@ class CollectionTransitionController {
         // replace cell to center of collection's row
         toLayout.itemsOffset = (toLayout.countOfColumns / 2 - (cellIndex % toLayout.countOfColumns))
         if toLayout.itemsOffset < 0 {
-            print("aaa")
             toLayout.itemsOffset = toLayout.countOfColumns + toLayout.itemsOffset
         }
-        // set cell size like in "from" collection
-        toLayout.scale = 1 / cellScaling
-        toCollection.contentOffset.y = 0
 
+        // set cell size like in "from" collection
         let fromCellAttribute = fromLayout.layoutAttributesForItem(at: IndexPath(item: cellIndex + fromLayout.itemsOffset, section: 0))!
         let toCellAttribute = toLayout.layoutAttributesForItem(at: IndexPath(item: cellIndex + toLayout.itemsOffset, section: 0))!
 
-        let cellSize = fromCollection.superview!.bounds.width / CGFloat(fromLayout.countOfColumns)
+        screenSize = fromCollection.superview!.bounds.size
+        screenCenter = CGPoint(x: screenSize.width / 2, y: screenSize.height / 2)
 
-        fromCellCenter = fromCellAttribute.center * cellSize - fromCollection.contentOffset
-        toCellCenter = toCellAttribute.center * cellSize - toCollection.contentOffset
+        fromCellCenter = fromCellAttribute.center - fromCollection.contentOffset
+        toCellCenter = toCellAttribute.center - toCollection.contentOffset
 
-        // change contentOffset to set target cell in "to" and "from" collections in one place
-        toCollection.contentOffset.y += (toCellCenter.y - fromCellCenter.y)
-        toLayout.offset = (fromCellCenter.x - toCellCenter.x)
+        toCollection.alpha = 1
+        toCollection.contentOffset.y += (toCellCenter.y - screenCenter.y)
+        toCollection.reloadData()
 
-        let fromContentOffset = fromCollection.superview!.bounds.width / 2.0 - fromCellCenter.x * cellScaling
+        toScreenOffsetY = toCollection.contentOffset.y
+        fromScreenOffsetY = fromCollection.contentOffset.y
 
-        fromLayoutXOffsetInterpolator = Interpolator(from: 0, to: fromContentOffset)
-        toLayoutXOffsetInterpolator = Interpolator(from: toLayout.offset, to: 0)
+        fromLayoutXOffsetInterpolator = Interpolator(
+            from: 0,
+            to: (screenCenter.x - fromCellCenter.x) * cellScaling
+        )
 
         fromLayoutYOffsetInterpolator = Interpolator(
-            from: fromCollection.contentOffset.y,
-            to: -(fromCellCenter.y - (fromCellCenter.y + fromCollection.contentOffset.y) * cellScaling)
+            from: 0,
+            to: (screenCenter.y - fromCellCenter.y) * cellScaling
+        )
+
+        toLayoutXOffsetInterpolator = Interpolator(
+            from: fromCellCenter.x - toCellCenter.x,
+            to: 0
         )
 
         toLayoutYOffsetInterpolator = Interpolator(
-            from: toCollection.contentOffset.y,
-            to: -(fromCellCenter.y - (toCellCenter.y) * cellScaling)
+            from: (fromCellCenter.y - screenCenter.y),
+            to: 0
         )
     }
 }
