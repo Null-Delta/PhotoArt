@@ -14,20 +14,7 @@ class CollectionTransitionController {
     private(set) var fromLayout: GalleryLayout
     private(set) var toLayout: GalleryLayout
     
-    private var cellIndex: Int
     private var cellScaling: CGFloat
-
-    // help params
-    private var fromCellCenter: CGPoint!
-    private var toCellCenter: CGPoint!
-    private var screenSize: CGSize!
-    private var screenCenter: CGPoint!
-
-    private var fromOffsetStart: CGFloat!
-    private var toOffsetStart: CGFloat!
-
-    private var toScreenOffsetY: CGFloat!
-    private var fromScreenOffsetY: CGFloat!
 
     private var fromLayoutXOffsetInterpolator: Interpolator
     private var toLayoutXOffsetInterpolator: Interpolator
@@ -37,28 +24,28 @@ class CollectionTransitionController {
 
     var progress: CGFloat = 0 {
         didSet {
-            fromCollection.alpha = progress < 0.5 ? 1 : 1 - (progress - 0.5) * 2
-            toCollection.alpha = Interpolator.rangeValue(from: 0, to: 1, progress: progress)
+            let normalizedProgress = toLayout.countOfColumns < fromLayout.countOfColumns ? progress : 1 - progress
 
-            let fromScale = Interpolator.rangeValue(from: 1, to: cellScaling, progress: progress)
+            fromCollection.alpha = normalizedProgress < 0.5 ? 1 : 1 - (normalizedProgress - 0.5) * 2
+            toCollection.alpha = normalizedProgress
+
+            let fromScale = Interpolator.rangeValue(from: 1, to: cellScaling, progress: normalizedProgress)
 
             fromCollection.transform =
                 .init(
-                    translationX: fromLayoutXOffsetInterpolator.value(progress: progress),
-                    y: fromLayoutYOffsetInterpolator.value(progress: progress)
+                    translationX: fromLayoutXOffsetInterpolator.value(progress: normalizedProgress),
+                    y: fromLayoutYOffsetInterpolator.value(progress: normalizedProgress)
                 )
                 .scaledBy(x: fromScale, y: fromScale)
-            fromCollection.contentOffset.y = fromScreenOffsetY
 
-            let toScale = Interpolator.rangeValue(from: 1 / cellScaling, to: 1, progress: progress)
+            let toScale = Interpolator.rangeValue(from: 1 / cellScaling, to: 1, progress: normalizedProgress)
 
             toCollection.transform =
                 .init(
-                    translationX: toLayoutXOffsetInterpolator.value(progress: progress),
-                    y: toLayoutYOffsetInterpolator.value(progress: progress)
+                    translationX: toLayoutXOffsetInterpolator.value(progress: normalizedProgress),
+                    y: toLayoutYOffsetInterpolator.value(progress: normalizedProgress)
                 )
                 .scaledBy(x: toScale, y: toScale)
-            toCollection.contentOffset.y = toScreenOffsetY
         }
     }
 
@@ -69,34 +56,28 @@ class CollectionTransitionController {
         self.fromLayout = fromCollection.collectionViewLayout as! GalleryLayout
         self.toLayout = toCollection.collectionViewLayout as! GalleryLayout
 
-        self.cellIndex = cell - fromLayout.itemsOffset
         self.cellScaling = CGFloat(fromLayout.countOfColumns) / CGFloat(toLayout.countOfColumns)
 
-        print(fromLayout.countOfColumns)
-        print(toLayout.countOfColumns)
-        print(cellScaling)
-
+        let cellIndex = cell - fromLayout.itemsOffset
         // replace cell to center of collection's row
         toLayout.itemsOffset = (toLayout.countOfColumns / 2 - (cellIndex % toLayout.countOfColumns))
         if toLayout.itemsOffset < 0 {
             toLayout.itemsOffset = toLayout.countOfColumns + toLayout.itemsOffset
         }
 
+        toCollection.reloadData()
+
         // set cell size like in "from" collection
         let fromCellAttribute = fromLayout.layoutAttributesForItem(at: IndexPath(item: cellIndex + fromLayout.itemsOffset, section: 0))!
         let toCellAttribute = toLayout.layoutAttributesForItem(at: IndexPath(item: cellIndex + toLayout.itemsOffset, section: 0))!
 
-        screenSize = fromCollection.superview!.bounds.size
-        screenCenter = CGPoint(x: screenSize.width / 2, y: screenSize.height / 2)
+        let screenSize = fromCollection.superview!.bounds.size
+        let screenCenter = CGPoint(x: screenSize.width / 2, y: screenSize.height / 2)
 
-        fromCellCenter = fromCellAttribute.center - fromCollection.contentOffset
-        toCellCenter = toCellAttribute.center - toCollection.contentOffset
+        let fromCellCenter = fromCellAttribute.center - fromCollection.contentOffset
+        let toCellCenter = toCellAttribute.center - toCollection.contentOffset
 
         toCollection.contentOffset.y += (toCellCenter.y - screenCenter.y)
-        toCollection.reloadData()
-
-        toScreenOffsetY = toCollection.contentOffset.y
-        fromScreenOffsetY = fromCollection.contentOffset.y
 
         fromLayoutXOffsetInterpolator = Interpolator(
             from: 0,

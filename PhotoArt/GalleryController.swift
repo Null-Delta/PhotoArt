@@ -94,7 +94,6 @@ class GalleryController: UIViewController {
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
 
         self.assets = PHAsset.fetchAssets(with: .image, options: options)
-
     }
 }
 
@@ -134,8 +133,8 @@ extension GalleryController: UICollectionViewDelegate {
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.contentOffset.x != 0 {
-                scrollView.contentOffset.x = 0
-            }
+            scrollView.contentOffset.x = 0
+        }
     }
 }
 

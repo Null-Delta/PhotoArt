@@ -21,8 +21,6 @@ class GalleryGrid: UIView {
 
     private var allCollections: [UICollectionView] = []
 
-    private var currentZoom: CGFloat = 1
-    private var animatedCollection: UICollectionView?
     private var animator: ValueAnimator? = nil
     private var transitionController: CollectionTransitionController?
 
@@ -47,145 +45,120 @@ class GalleryGrid: UIView {
     }
 
     private var zoomCellIndex: Int
-    private var pinchOffset: CGFloat = 0
 
-    private var isUnscale = false
     private var wasZoomStarted = false
 
+    private var localScale: CGFloat = 1
+    private var lastScale: CGFloat = 1
+    private var lastVelocity: CGFloat = 0
+
+    private var globalScale: CGFloat {
+        return max(1, min(localScale * pinchGesture.scale, 13))
+    }
+    private var progress: CGFloat {
+        if lastVelocity >= 0 {
+            switch globalScale {
+            case 1...2.6:
+                return (globalScale - 1) / 1.6
+            case 2.6...(2.6 * 5.0 / 3.0):
+                return (globalScale - 2.6) / ((2.6 * 5.0 / 3.0) - 2.6)
+            case (2.6 * 5.0 / 3.0)...13:
+                return (globalScale - (2.6 * 5.0 / 3.0)) / (13 - (2.6 * 5.0 / 3.0))
+            default:
+                return 0
+            }
+        } else {
+            switch globalScale {
+            case 1..<2.6:
+                return (globalScale - 1) / 1.6
+            case 2.6..<(2.6 * 5.0 / 3.0):
+                return (globalScale - 2.6) / ((2.6 * 5.0 / 3.0) - 2.6)
+            case (2.6 * 5.0 / 3.0)...13:
+                return (globalScale - (2.6 * 5.0 / 3.0)) / (13 - (2.6 * 5.0 / 3.0))
+            default:
+                return 0
+            }
+        }
+    }
+    private var wasJump: Int {
+        let b = CGFloat(2.6 * 5.0 / 3.0)
+        if ![2.6, b].filter({ lastScale < $0 && globalScale > $0 }).isEmpty { return 1 }
+        if ![2.6, b].filter({ lastScale > $0 && globalScale < $0 }).isEmpty { return -1 }
+        return 0
+    }
+
+    var isAnimationUpscale: Bool {
+        guard let controller = transitionController else { return false }
+        return controller.toLayout.countOfColumns < controller.fromLayout.countOfColumns
+    }
+
+    func getPerfectScale(for value: CGFloat) -> CGFloat {
+        if lastVelocity > 0 {
+            switch localScale * value {
+            case ..<2.6:
+                return 2.6 / localScale
+            case 2.6..<(2.6 * 5.0 / 3.0):
+                return (2.6 * 5.0 / 3.0) / localScale
+            case (2.6 * 5.0 / 3.0)...:
+                return 13 / localScale
+            default:
+                return value
+            }
+        } else {
+            switch localScale * value {
+            case ..<2.6:
+                return 1 / localScale
+            case 2.6..<(2.6 * 5.0 / 3.0):
+                return 2.6 / localScale
+            case (2.6 * 5.0 / 3.0)...:
+                return (2.6 * 5.0 / 3.0) / localScale
+            default:
+                return value
+            }
+        }
+    }
+
     private func aaa() {
-        guard
-            !(!isUnscale && signScale > 1 && allCollections.firstIndex(of: currentCollection)! == 1),
-            !(isUnscale && signScale > 0 && allCollections.firstIndex(of: currentCollection)! == 0),
-            !(isUnscale && signScale < -1 && allCollections.firstIndex(of: currentCollection)! == allCollections.count - 2),
-            !(!isUnscale && signScale < 0 && allCollections.firstIndex(of: currentCollection)! == allCollections.count - 1),
-            !(normalizedScale < 0 && allCollections.firstIndex(of: transitionController!.toCollection)! == 3)
-        else {
-            return
-        }
-        
-        if !isUnscale {
-            if signScale > 1 {
-                isUnscale = false
-                transitionController?.progress = 1
-                pinchOffset += 1
+        if wasJump == -1 {
+            transitionController?.progress = 0
+            currentCollection = isAnimationUpscale ? transitionController?.fromCollection : transitionController?.toCollection
+            zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
 
-                currentCollection = transitionController!.toCollection
-                zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
-                let nextCollection = getNextAfter(collection: currentCollection)
+            let nextCollection = getNextBefore(collection: currentCollection)
+            transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+            transitionController?.progress = progress
 
-                self.transitionController = nil
+        } else if wasJump == 1 {
+            transitionController?.progress = 1
+            currentCollection = isAnimationUpscale ? transitionController?.toCollection : transitionController?.fromCollection
+            zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
 
-                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-                transitionController?.progress = unsignScale
-            } else if signScale < 0 {
-                isUnscale = true
-                transitionController?.progress = 0
-                pinchOffset -= 1
-
-                currentCollection = transitionController!.fromCollection
-
-                zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
-                let nextCollection = getNextBefore(collection: currentCollection)
-
-                self.transitionController = nil
-
-                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-                transitionController?.progress = unsignScale
-            } else {
-                transitionController?.progress = min(1, max(0, unsignScale))
-            }
-        } else if isUnscale {
-            if signScale > 0 {
-                isUnscale = false
-                transitionController?.progress = 0
-                pinchOffset += 1
-
-                currentCollection = transitionController!.fromCollection
-                zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
-                let nextCollection = getNextAfter(collection: currentCollection)
-
-                self.transitionController = nil
-
-                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-                transitionController?.progress = unsignScale
-            } else if signScale < -1 {
-                isUnscale = true
-                transitionController?.progress = 1
-                pinchOffset -= 0.5
-
-                currentCollection = transitionController!.toCollection
-
-                zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
-                let nextCollection = getNextBefore(collection: currentCollection)
-
-                self.transitionController = nil
-
-                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-                transitionController?.progress = unsignScale
-            } else {
-                transitionController?.progress = min(1, max(0, unsignScale))
-            }
-        }
-    }
-
-    var normalizedScale: CGFloat {
-        return pinchGesture.scale - 1 - pinchOffset
-    }
-
-    var unsignScale: CGFloat {
-        if !isUnscale {
-            return normalizedScale
+            let nextCollection = getNextAfter(collection: currentCollection)
+            transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+            transitionController?.progress = progress
         } else {
-            return 1 / normalizedScale - 1
+            transitionController?.progress = min(1, max(0, progress))
         }
-    }
-
-    var signScale: CGFloat {
-        if !isUnscale {
-            return unsignScale
-        } else {
-            return -unsignScale
-        }
-    }
-
-    var normalizedPinch: CGFloat {
-        if pinchGesture.scale > 1 {
-            return pinchGesture.scale
-        } else {
-            return 1 / pinchGesture.scale
-        }
+        lastScale = globalScale
     }
 
     @objc private func onZoom() {
-        print(pinchGesture.scale)
-
+        //print(globalScale)
         switch pinchGesture.state {
         case .began:
-            pinchOffset = 0
-
             guard
-                !(normalizedScale > 0 && allCollections.firstIndex(of: currentCollection)! == 0),
-                !(normalizedScale < 0 && allCollections.firstIndex(of: currentCollection)! == allCollections.count - 1)
+                !(pinchGesture.velocity > 0 && allCollections.firstIndex(of: currentCollection) == 0),
+                !(pinchGesture.velocity < 0 && allCollections.firstIndex(of: currentCollection) == allCollections.count - 1)
             else {
                 return
             }
 
             zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
-            let nextCollection: UICollectionView
-            if normalizedScale > 0 {
-                isUnscale = false
-                nextCollection = getNextAfter(collection: currentCollection)
-                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-                transitionController?.progress = unsignScale
-            } else {
-                pinchOffset -= 1
-                isUnscale = true
-                nextCollection = getNextBefore(collection: currentCollection)
-                transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-                transitionController?.progress = unsignScale
-            }
+            let nextCollection = pinchGesture.velocity > 0 ? getNextAfter(collection: currentCollection) : getNextBefore(collection: currentCollection)
+            transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+            transitionController?.progress = pinchGesture.velocity > 0 ? 0 : 1
             wasZoomStarted = true
-
+            lastScale = globalScale
 
         case .changed:
             guard wasZoomStarted else { return }
@@ -193,33 +166,30 @@ class GalleryGrid: UIView {
 
         case .ended:
             guard wasZoomStarted else { return }
-            pinchGesture.isEnabled = false
             wasZoomStarted = false
+            pinchGesture.isEnabled = false
+            lastVelocity = pinchGesture.velocity
 
-//            let velocity = isUnscale ? 0.0 : 0.0
-//            let d = 0.25
+            let d = 0.25
+            let lastScale = getPerfectScale(for: pinchGesture.scale + (pinchGesture.velocity * d) / ((1 - d)))
+            let deltaScale = lastScale - pinchGesture.scale
 
-//            let lastScale = isUnscale ?
-//            floor(pinchGesture.scale + (velocity * d) / ((1 - d))) :
-//            ceil(pinchGesture.scale + (velocity * d) / ((1 - d)))
-//
-//            let deltaScale = lastScale - pinchGesture.scale
-            let deltaProgress = 1 - self.transitionController!.progress
-
-            animator = ValueAnimator(duration: 0.5, animation: {[unowned self] progress in
-                //pinchGesture.scale = lastScale - ((1 - progress) * deltaScale)
-                self.transitionController?.progress = 1 - deltaProgress * (1 - progress)
-                //aaa()
+            animator = ValueAnimator(duration: 0.75, animation: {[unowned self] progress in
+                pinchGesture.scale = lastScale - ((1 - progress) * deltaScale)
+                aaa()
             }, curve: { x in
-                return 1  - (1 - x) * (1 - x)
+                return 1 - pow(1 - x, 4)
             }, complition: { [unowned self] isComplete in
-                pinchGesture.isEnabled = true
-
+                print(globalScale)
+                self.transitionController!.progress = progress
                 currentCollection = self.transitionController!.toCollection
+                print((currentCollection.collectionViewLayout as! GalleryLayout).countOfColumns)
+
                 self.transitionController = nil
                 animator = nil
+                localScale = globalScale
                 pinchGesture.scale = 1
-                pinchOffset = 0
+                pinchGesture.isEnabled = true
             })
 
             animator?.start()
@@ -229,8 +199,10 @@ class GalleryGrid: UIView {
         }
     }
 
-    
-    init(delegate: UICollectionViewDelegate? = nil, dataSource: UICollectionViewDataSource? = nil) {
+    init(
+        delegate: UICollectionViewDelegate? = nil,
+        dataSource: UICollectionViewDataSource? = nil
+    ) {
         self.delegate = delegate
         self.zoomCellIndex = 0
         self.dataSource = dataSource
@@ -258,7 +230,7 @@ class GalleryGrid: UIView {
             allCollections.append(collection)
         }
 
-        currentCollection = allCollections.last!
+        currentCollection = allCollections.last
 
         for collection in allCollections {
             addSubview(collection)

@@ -11,12 +11,7 @@ class GalleryLayout: UICollectionViewLayout {
 
     private(set) var cellSize: CGFloat = 0
 
-    var itemsOffset: Int = 0 {
-        didSet {
-            needRecalculate = true
-            invalidateLayout()
-        }
-    }
+    var itemsOffset: Int = 0
 
     private var needRecalculate: Bool = true
 
@@ -27,7 +22,7 @@ class GalleryLayout: UICollectionViewLayout {
 
     private func binarySearch(rect: CGRect, step: Int? = nil, position: Int = 0) -> Int {
         var left = 0
-        var right = attributes.count + itemsOffset - 1
+        var right = attributes.count + countOfColumns - 1
 
         while(left != right) {
             let index = (left + right) / 2
@@ -51,7 +46,7 @@ class GalleryLayout: UICollectionViewLayout {
     }
 
     override var collectionViewContentSize: CGSize {
-        return CGSize(width: collectionView!.frame.width, height: ceil(CGFloat(countOfItems + itemsOffset) / CGFloat(countOfColumns)) * cellSize)
+        return CGSize(width: collectionView!.frame.width, height: ceil(CGFloat(countOfItems + countOfColumns) / CGFloat(countOfColumns)) * cellSize)
     }
 
     init(countOfColumns: Int) {
@@ -66,7 +61,7 @@ class GalleryLayout: UICollectionViewLayout {
 
         attributes.removeAll()
         needRecalculate = false
-        countOfItems = collectionView!.numberOfItems(inSection: 0) + itemsOffset
+        countOfItems = collectionView!.numberOfItems(inSection: 0) + countOfColumns
 
         for index in 0..<countOfItems {
             let attribure = UICollectionViewLayoutAttributes(forCellWith: IndexPath(item: index, section: 0))
