@@ -105,6 +105,8 @@ extension GalleryController: UICollectionViewDelegate {
             indexPath.item - layout.itemsOffset >= 0
         else { return }
 
+        let size = CGSize(width: view.bounds.width * UIScreen.main.scale, height: view.bounds.height * UIScreen.main.scale)
+
         DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
             let requestOptions = PHImageRequestOptions()
             requestOptions.isSynchronous = true
@@ -112,7 +114,7 @@ extension GalleryController: UICollectionViewDelegate {
 
             manager.requestImage(
                 for: assets.object(at: indexPath.item - layout.itemsOffset),
-                targetSize: CGSize(width: view.bounds.width * UIScreen.main.scale, height: view.bounds.height * UIScreen.main.scale),
+                targetSize: size,
                 contentMode: .aspectFit,
                 options: requestOptions
             ) { [weak self] (image, _) -> Void in

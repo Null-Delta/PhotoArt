@@ -26,8 +26,7 @@ class CollectionTransitionController {
         didSet {
             let normalizedProgress = toLayout.countOfColumns < fromLayout.countOfColumns ? progress : 1 - progress
 
-            fromCollection.alpha = normalizedProgress < 0.5 ? 1 : 1 - (normalizedProgress - 0.5) * 2
-            toCollection.alpha = normalizedProgress
+            fromCollection.alpha = 1 - normalizedProgress
 
             let fromScale = Interpolator.rangeValue(from: 1, to: cellScaling, progress: normalizedProgress)
 
@@ -50,8 +49,13 @@ class CollectionTransitionController {
     }
 
     init(from: UICollectionView, to: UICollectionView, cell: Int) {
+        //TODO: сделай чтоб ячейки центрировались относительно друг друга, а не от центра экрана
         self.fromCollection = from
         self.toCollection = to
+        toCollection.layer.zPosition = 0
+        fromCollection.layer.zPosition = 1
+        fromCollection.alpha = 0
+        toCollection.alpha = 1
 
         self.fromLayout = fromCollection.collectionViewLayout as! GalleryLayout
         self.toLayout = toCollection.collectionViewLayout as! GalleryLayout

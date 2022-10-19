@@ -119,6 +119,9 @@ class GalleryGrid: UIView {
     }
 
     private func aaa() {
+        if wasJump != 0 {
+            allCollections.forEach { $0.alpha = 0 }
+        }
         if wasJump == -1 {
             transitionController?.progress = 0
             currentCollection = isAnimationUpscale ? transitionController?.fromCollection : transitionController?.toCollection
@@ -174,16 +177,27 @@ class GalleryGrid: UIView {
             let lastScale = getPerfectScale(for: pinchGesture.scale + (pinchGesture.velocity * d) / ((1 - d)))
             let deltaScale = lastScale - pinchGesture.scale
 
-            animator = ValueAnimator(duration: 0.75, animation: {[unowned self] progress in
+            animator = ValueAnimator(duration: 0.5, animation: {[unowned self] progress in
                 pinchGesture.scale = lastScale - ((1 - progress) * deltaScale)
                 aaa()
             }, curve: { x in
-                return 1 - pow(1 - x, 4)
+                return 1 - pow(1 - x, 2)
             }, complition: { [unowned self] isComplete in
-                print(globalScale)
                 self.transitionController!.progress = progress
-                currentCollection = self.transitionController!.toCollection
-                print((currentCollection.collectionViewLayout as! GalleryLayout).countOfColumns)
+
+                if isAnimationUpscale {
+                    if lastVelocity > 0 {
+                        currentCollection = self.transitionController!.toCollection
+                    } else {
+                        currentCollection = self.transitionController!.fromCollection
+                    }
+                } else {
+                    if lastVelocity > 0 {
+                        currentCollection = self.transitionController!.fromCollection
+                    } else {
+                        currentCollection = self.transitionController!.toCollection
+                    }
+                }
 
                 self.transitionController = nil
                 animator = nil
@@ -226,7 +240,8 @@ class GalleryGrid: UIView {
             collection.delegate = delegate
             collection.dataSource = dataSource
             collection.clipsToBounds = false
-
+            collection.contentInset.top = collection.safeAreaInsets.top
+            collection.insetsLayoutMarginsFromSafeArea = true
             allCollections.append(collection)
         }
 

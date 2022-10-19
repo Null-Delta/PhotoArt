@@ -84,22 +84,11 @@ class GalleryLayout: UICollectionViewLayout {
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         var visibleAttributes: [UICollectionViewLayoutAttributes] = []
 
-        let firstItem = binarySearch(rect: rect)
+        let firstItem = max(0, Int(floor(rect.minY / cellSize)) * countOfColumns)
+        let lastItem = min(Int(floor(rect.maxY / cellSize)) * countOfColumns + countOfColumns, countOfItems - 1)
 
-        for index in firstItem..<attributes.count {
-            if isIn(top: rect.minY, bottom: rect.maxY, rect: attributes[index].frame) {
-                visibleAttributes.append(attributes[index])
-            } else {
-                break
-            }
-        }
-
-        for index in (0..<firstItem).reversed() {
-            if isIn(top: rect.minY, bottom: rect.maxY, rect: attributes[index].frame) {
-                visibleAttributes.append(attributes[index])
-            } else {
-                break
-            }
+        for index in firstItem..<lastItem {
+            visibleAttributes.append(attributes[index])
         }
 
         return visibleAttributes
