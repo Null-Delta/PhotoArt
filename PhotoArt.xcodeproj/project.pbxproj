@@ -10,6 +10,9 @@
 		863793BC28F9776800C64A82 /* AccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793BB28F9776800C64A82 /* AccessController.swift */; };
 		863793BF28F978F200C64A82 /* AccessTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */; };
 		863793C128F9790E00C64A82 /* AccessDisappearAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */; };
+		8658A7882901E5100070C893 /* BeizerLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8658A7872901E5100070C893 /* BeizerLine.swift */; };
+		8658A78A2901EB780070C893 /* BeizerShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8658A7892901EB780070C893 /* BeizerShader.metal */; };
+		8658A78C2901EC7E0070C893 /* Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8658A78B2901EC7E0070C893 /* Canvas.swift */; };
 		8668D71928F73BAD00A2E72E /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71828F73BAC00A2E72E /* UIColor+Extensions.swift */; };
 		8668D71B28F751B300A2E72E /* Switcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71A28F751B300A2E72E /* Switcher.swift */; };
 		8668D71E28F7592400A2E72E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71D28F7592400A2E72E /* Tool.swift */; };
@@ -21,6 +24,8 @@
 		8668D72C28F8117300A2E72E /* DefaultDrawTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D72B28F8117300A2E72E /* DefaultDrawTool.swift */; };
 		8668D72E28F82BB700A2E72E /* LassoTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D72D28F82BB700A2E72E /* LassoTool.swift */; };
 		868C5D2728F5992A0064FD18 /* ColorButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868C5D2628F5992A0064FD18 /* ColorButton.swift */; };
+		8693FBD92901657400A3CE21 /* MultiGalleryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8693FBD82901657400A3CE21 /* MultiGalleryCell.swift */; };
+		8693FBDB2901696800A3CE21 /* MultiGalleryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8693FBDA2901696800A3CE21 /* MultiGalleryLayout.swift */; };
 		8699623F28F3602900F3850F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699623E28F3602900F3850F /* AppDelegate.swift */; };
 		8699624128F3602900F3850F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699624028F3602900F3850F /* SceneDelegate.swift */; };
 		8699624328F3602900F3850F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8699624228F3602900F3850F /* ViewController.swift */; };
@@ -55,6 +60,9 @@
 		863793BB28F9776800C64A82 /* AccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessController.swift; sourceTree = "<group>"; };
 		863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessTransitioningDelegate.swift; sourceTree = "<group>"; };
 		863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessDisappearAnimation.swift; sourceTree = "<group>"; };
+		8658A7872901E5100070C893 /* BeizerLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeizerLine.swift; sourceTree = "<group>"; };
+		8658A7892901EB780070C893 /* BeizerShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BeizerShader.metal; sourceTree = "<group>"; };
+		8658A78B2901EC7E0070C893 /* Canvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Canvas.swift; sourceTree = "<group>"; };
 		8668D71828F73BAC00A2E72E /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		8668D71A28F751B300A2E72E /* Switcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Switcher.swift; sourceTree = "<group>"; };
 		8668D71D28F7592400A2E72E /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
@@ -66,6 +74,8 @@
 		8668D72B28F8117300A2E72E /* DefaultDrawTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDrawTool.swift; sourceTree = "<group>"; };
 		8668D72D28F82BB700A2E72E /* LassoTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LassoTool.swift; sourceTree = "<group>"; };
 		868C5D2628F5992A0064FD18 /* ColorButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorButton.swift; sourceTree = "<group>"; };
+		8693FBD82901657400A3CE21 /* MultiGalleryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiGalleryCell.swift; sourceTree = "<group>"; };
+		8693FBDA2901696800A3CE21 /* MultiGalleryLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiGalleryLayout.swift; sourceTree = "<group>"; };
 		8699623B28F3602900F3850F /* PhotoArt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoArt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8699623E28F3602900F3850F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8699624028F3602900F3850F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -124,6 +134,15 @@
 			name = Access;
 			sourceTree = "<group>";
 		};
+		8658A7862901E5020070C893 /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				8658A7872901E5100070C893 /* BeizerLine.swift */,
+				8658A7892901EB780070C893 /* BeizerShader.metal */,
+			);
+			name = Actions;
+			sourceTree = "<group>";
+		};
 		8668D71C28F7591C00A2E72E /* Tool */ = {
 			isa = PBXGroup;
 			children = (
@@ -179,9 +198,11 @@
 		8699625428F3612A00F3850F /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				8658A7862901E5020070C893 /* Actions */,
 				8699626428F4187F00F3850F /* ToolBar */,
 				8699625228F3611C00F3850F /* EditorViewController.swift */,
 				8699626228F378B600F3850F /* EditorNavigationBar.swift */,
+				8658A78B2901EC7E0070C893 /* Canvas.swift */,
 			);
 			name = Editor;
 			sourceTree = "<group>";
@@ -218,8 +239,10 @@
 				86A4816F28F8992C00207D58 /* GalleryController.swift */,
 				86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */,
 				86A4817B28F951F200207D58 /* GalleryLayout.swift */,
+				8693FBDA2901696800A3CE21 /* MultiGalleryLayout.swift */,
 				86A4817428F89E6600207D58 /* Editor Animations */,
 				86A4817128F899D900207D58 /* GalleryCell.swift */,
+				8693FBD82901657400A3CE21 /* MultiGalleryCell.swift */,
 			);
 			name = Gallery;
 			sourceTree = "<group>";
@@ -293,6 +316,7 @@
 				TargetAttributes = {
 					8699623A28F3602900F3850F = {
 						CreatedOnToolsVersion = 14.0;
+						LastSwiftMigration = 1410;
 					};
 				};
 			};
@@ -384,6 +408,8 @@
 				8668D71E28F7592400A2E72E /* Tool.swift in Sources */,
 				8668D72C28F8117300A2E72E /* DefaultDrawTool.swift in Sources */,
 				86B0784028FD85A200B4EB3F /* GalleryGrid.swift in Sources */,
+				8658A78A2901EB780070C893 /* BeizerShader.metal in Sources */,
+				8658A7882901E5100070C893 /* BeizerLine.swift in Sources */,
 				868C5D2728F5992A0064FD18 /* ColorButton.swift in Sources */,
 				86A4817C28F951F200207D58 /* GalleryLayout.swift in Sources */,
 				8668D72828F77B0F00A2E72E /* EraseTool.swift in Sources */,
@@ -399,15 +425,18 @@
 				8668D71928F73BAD00A2E72E /* UIColor+Extensions.swift in Sources */,
 				8668D72428F7722E00A2E72E /* BrushTool.swift in Sources */,
 				86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */,
+				8693FBDB2901696800A3CE21 /* MultiGalleryLayout.swift in Sources */,
 				86B0783B28FC7E9A00B4EB3F /* ValueAnimator.swift in Sources */,
 				863793BC28F9776800C64A82 /* AccessController.swift in Sources */,
 				86A4817028F8992C00207D58 /* GalleryController.swift in Sources */,
+				8658A78C2901EC7E0070C893 /* Canvas.swift in Sources */,
 				8699626128F36E1D00F3850F /* CGPoint+Extensions.swift in Sources */,
 				86A4817828F89EBE00207D58 /* HeroAppearAnimation.swift in Sources */,
 				8668D71B28F751B300A2E72E /* Switcher.swift in Sources */,
 				8699625E28F36BBD00F3850F /* MetalContext.swift in Sources */,
 				8699625328F3611C00F3850F /* EditorViewController.swift in Sources */,
 				8699626628F4188900F3850F /* ToolBar.swift in Sources */,
+				8693FBD92901657400A3CE21 /* MultiGalleryCell.swift in Sources */,
 				86A4817A28F8BFF800207D58 /* HeroDisappearAnimation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -546,6 +575,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = G7668ALM57;
@@ -566,6 +596,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = delta.null.PhotoArt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -577,6 +608,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = G7668ALM57;

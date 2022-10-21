@@ -101,33 +101,40 @@ extension GalleryController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard
             let layout = collectionView.collectionViewLayout as? GalleryLayout,
-            let cell = collectionView.cellForItem(at: indexPath) as? GalleryCell,
             indexPath.item - layout.itemsOffset >= 0
         else { return }
 
-        let size = CGSize(width: view.bounds.width * UIScreen.main.scale, height: view.bounds.height * UIScreen.main.scale)
 
-        DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
-            let requestOptions = PHImageRequestOptions()
-            requestOptions.isSynchronous = true
-            requestOptions.isNetworkAccessAllowed = true
+        if layout is MultiGalleryLayout {
+            collection.animateZoom(atIndex: indexPath.item * layout.countOfColumns + 1)
+        } else {
+            guard
+                let cell = collectionView.cellForItem(at: indexPath) as? GalleryCell
+            else { return }
+            let size = CGSize(width: view.bounds.width * UIScreen.main.scale, height: view.bounds.height * UIScreen.main.scale)
 
-            manager.requestImage(
-                for: assets.object(at: indexPath.item - layout.itemsOffset),
-                targetSize: size,
-                contentMode: .aspectFit,
-                options: requestOptions
-            ) { [weak self] (image, _) -> Void in
-                DispatchQueue.main.async {
-                    cell.image = image
-                    self!.heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: self!.view))
+            DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+                let requestOptions = PHImageRequestOptions()
+                requestOptions.isSynchronous = true
+                requestOptions.isNetworkAccessAllowed = true
 
-                    let editor = EditorViewController()
-                    editor.image = image ?? UIImage(named: "testImage")!
-                    editor.modalPresentationStyle = .overFullScreen
-                    editor.transitioningDelegate = self!.heroTransition
+                manager.requestImage(
+                    for: assets.object(at: indexPath.item - layout.itemsOffset),
+                    targetSize: size,
+                    contentMode: .aspectFit,
+                    options: requestOptions
+                ) { [weak self] (image, _) -> Void in
+                    DispatchQueue.main.async {
+                        cell.image = image
+                        self!.heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: self!.view))
 
-                    self!.present(editor, animated: true)
+                        let editor = EditorViewController()
+                        editor.image = image ?? UIImage(named: "testImage")!
+                        editor.modalPresentationStyle = .overFullScreen
+                        editor.transitioningDelegate = self!.heroTransition
+
+                        self!.present(editor, animated: true)
+                    }
                 }
             }
         }
@@ -143,7 +150,12 @@ extension GalleryController: UICollectionViewDelegate {
 extension GalleryController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let layout = collectionView.collectionViewLayout as? GalleryLayout else { return 0 }
-        return assets.count + layout.itemsOffset
+
+        if layout is MultiGalleryLayout {
+            return Int(ceil(CGFloat(assets.count) / CGFloat(layout.countOfColumns)))
+        } else {
+            return assets.count + layout.itemsOffset
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -151,38 +163,74 @@ extension GalleryController: UICollectionViewDataSource {
             let layout = collectionView.collectionViewLayout as? GalleryLayout
         else { return UICollectionViewCell() }
 
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photo", for: indexPath) as! GalleryCell
+        var imageSize: CGSize = CGSize(width: layout.cellSize, height: layout.cellSize)
 
-        let imageSize: CGSize = CGSize(width: layout.cellSize, height: layout.cellSize)
-        cell.bordered = layout.countOfColumns <= 5
+        if layout is MultiGalleryLayout {
+            imageSize = CGSize(width: imageSize.width / 5, height: imageSize.height / 5)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "multi_photo", for: indexPath) as! MultiGalleryCell
+            cell.clearImages()
+            
+            for assetIndex in 0..<13 {
+                let globalIndex = indexPath.item * layout.countOfColumns + assetIndex - layout.itemsOffset
 
-        cell.image = nil
+                guard
+                    globalIndex >= 0,
+                    globalIndex < assets.count
+                else {
+                    cell.updateImage(at: assetIndex, image: nil)
+                    continue
+                }
 
-        guard
-            indexPath.item - layout.itemsOffset >= 0
-        else {
-            return cell
-        }
+                DispatchQueue.global(qos: .userInitiated).async {[unowned self] in
+                    let options = PHImageRequestOptions()
+                    options.isSynchronous = false
+                    options.isNetworkAccessAllowed = false
+                    options.deliveryMode = .fastFormat
 
-        DispatchQueue.global(qos: .userInteractive).async {[unowned self] in
-            let options = PHImageRequestOptions()
-            options.isSynchronous = true
-            options.isNetworkAccessAllowed = true
-
-            manager.requestImage(
-                for: assets.object(at: indexPath.item - layout.itemsOffset),
-                targetSize: imageSize,
-                contentMode: .aspectFill,
-                options: options
-            ) { (image, _) -> Void in
-                DispatchQueue.main.async {
-                    cell.image = image ?? UIImage(named: "testImage")
+                    manager.requestImage(
+                        for: assets.object(at: globalIndex),
+                        targetSize: imageSize,
+                        contentMode: .aspectFill,
+                        options: options
+                    ) { (image, _) -> Void in
+                        DispatchQueue.main.async {
+                            cell.updateImage(at: assetIndex, image: image)
+                        }
+                    }
                 }
             }
+
+            return cell
+
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photo", for: indexPath) as! GalleryCell
+
+            cell.bordered = layout.countOfColumns <= 5
+            cell.image = nil
+
+            guard
+                indexPath.item - layout.itemsOffset >= 0
+            else {
+                return cell
+            }
+
+            DispatchQueue.global(qos: .default).async {[unowned self] in
+                let options = PHImageRequestOptions()
+                options.isSynchronous = false
+                options.isNetworkAccessAllowed = true
+
+                manager.requestImage(
+                    for: assets.object(at: indexPath.item - layout.itemsOffset),
+                    targetSize: imageSize,
+                    contentMode: .aspectFill,
+                    options: options
+                ) { (image, _) -> Void in
+                    DispatchQueue.main.async {
+                        cell.image = image
+                    }
+                }
+            }
+            return cell
         }
-
-        return cell
     }
-
-
 }

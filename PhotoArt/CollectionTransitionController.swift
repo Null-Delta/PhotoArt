@@ -26,7 +26,8 @@ class CollectionTransitionController {
         didSet {
             let normalizedProgress = toLayout.countOfColumns < fromLayout.countOfColumns ? progress : 1 - progress
 
-            fromCollection.alpha = 1 - normalizedProgress
+            let alphaProgress = normalizedProgress > 0 ? ((normalizedProgress - 0) / 1) : 0
+            toCollection.alpha = -(cos(CGFloat.pi * alphaProgress) - 1.0) / 2.0
 
             let fromScale = Interpolator.rangeValue(from: 1, to: cellScaling, progress: normalizedProgress)
 
@@ -52,10 +53,12 @@ class CollectionTransitionController {
         //TODO: сделай чтоб ячейки центрировались относительно друг друга, а не от центра экрана
         self.fromCollection = from
         self.toCollection = to
-        toCollection.layer.zPosition = 0
-        fromCollection.layer.zPosition = 1
-        fromCollection.alpha = 0
-        toCollection.alpha = 1
+        toCollection.layer.zPosition = 1
+        fromCollection.layer.zPosition = 0
+        fromCollection.isUserInteractionEnabled = false
+        toCollection.isUserInteractionEnabled = true
+        fromCollection.alpha = 1
+        toCollection.alpha = 0
 
         self.fromLayout = fromCollection.collectionViewLayout as! GalleryLayout
         self.toLayout = toCollection.collectionViewLayout as! GalleryLayout
@@ -69,17 +72,25 @@ class CollectionTransitionController {
             toLayout.itemsOffset = toLayout.countOfColumns + toLayout.itemsOffset
         }
 
-        toCollection.reloadData()
+        let fromCellFrame = CGRect(
+            x: CGFloat((cellIndex + fromLayout.itemsOffset) % fromLayout.countOfColumns) * fromLayout.cellSize,
+            y: CGFloat((cellIndex + fromLayout.itemsOffset) / fromLayout.countOfColumns) * fromLayout.cellSize,
+            width: fromLayout.cellSize,
+            height: fromLayout.cellSize
+        )
 
-        // set cell size like in "from" collection
-        let fromCellAttribute = fromLayout.layoutAttributesForItem(at: IndexPath(item: cellIndex + fromLayout.itemsOffset, section: 0))!
-        let toCellAttribute = toLayout.layoutAttributesForItem(at: IndexPath(item: cellIndex + toLayout.itemsOffset, section: 0))!
+        let toCellFrame = CGRect(
+            x: CGFloat((cellIndex + toLayout.itemsOffset) % toLayout.countOfColumns) * toLayout.cellSize,
+            y: CGFloat((cellIndex + toLayout.itemsOffset) / toLayout.countOfColumns)  * toLayout.cellSize,
+            width: toLayout.cellSize,
+            height: toLayout.cellSize
+        )
 
         let screenSize = fromCollection.superview!.bounds.size
         let screenCenter = CGPoint(x: screenSize.width / 2, y: screenSize.height / 2)
 
-        let fromCellCenter = fromCellAttribute.center - fromCollection.contentOffset
-        let toCellCenter = toCellAttribute.center - toCollection.contentOffset
+        let fromCellCenter = fromCellFrame.center - fromCollection.contentOffset
+        let toCellCenter = toCellFrame.center - toCollection.contentOffset
 
         toCollection.contentOffset.y += (toCellCenter.y - screenCenter.y)
 
@@ -102,6 +113,10 @@ class CollectionTransitionController {
             from: (fromCellCenter.y - screenCenter.y),
             to: 0
         )
+
+        DispatchQueue.main.async {
+            self.toCollection.reloadData()
+        }
     }
 }
 

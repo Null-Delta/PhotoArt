@@ -1,32 +1,16 @@
 //
-//  GalleryLayout.swift
+//  MultiGalleryLayout.swift
 //  PhotoArt
 //
-//  Created by Rustam Khakhuk on 14.10.2022.
+//  Created by Rustam Khakhuk on 20.10.2022.
 //
 
 import UIKit
 
-class GalleryLayout: UICollectionViewLayout {
-
-    var cellSize: CGFloat = 0
-
-    var itemsOffset: Int = 0
-
-    var needRecalculate: Bool = true
-
-    var countOfColumns = 9
-    var countOfItems: Int = 0
-
-    var attributes: [UICollectionViewLayoutAttributes] = []
+class MultiGalleryLayout: GalleryLayout {
 
     override var collectionViewContentSize: CGSize {
-        return CGSize(width: collectionView!.frame.width, height: ceil(CGFloat(countOfItems + countOfColumns) / CGFloat(countOfColumns)) * cellSize)
-    }
-
-    init(countOfColumns: Int) {
-        self.countOfColumns = countOfColumns
-        super.init()
+        return CGSize(width: collectionView!.frame.width, height: CGFloat(countOfItems) * cellSize)
     }
 
     override func prepare() {
@@ -42,9 +26,9 @@ class GalleryLayout: UICollectionViewLayout {
             let attribure = UICollectionViewLayoutAttributes(forCellWith: IndexPath(item: index, section: 0))
 
             attribure.frame = CGRect(
-                x: CGFloat((index % Int(countOfColumns))) * cellSize,
-                y: floor(CGFloat(index) / CGFloat(countOfColumns)) * cellSize,
-                width: cellSize,
+                x: 0,
+                y: CGFloat(index) * cellSize,
+                width: collectionView!.frame.width,
                 height: cellSize
             )
 
@@ -52,15 +36,11 @@ class GalleryLayout: UICollectionViewLayout {
         }
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         var visibleAttributes: [UICollectionViewLayoutAttributes] = []
 
-        let firstItem = max(0, Int(floor(rect.minY / cellSize)) * countOfColumns)
-        let lastItem = min(Int(floor(rect.maxY / cellSize)) * countOfColumns + countOfColumns, countOfItems - 1)
+        let firstItem = max(0, Int(floor(rect.minY / cellSize)))
+        let lastItem = min(Int(floor(rect.maxY / cellSize)) + 1, countOfItems - 1)
 
         for index in firstItem..<lastItem {
             visibleAttributes.append(attributes[index])

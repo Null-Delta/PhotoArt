@@ -120,8 +120,12 @@ class GalleryGrid: UIView {
 
     private func aaa() {
         if wasJump != 0 {
-            allCollections.forEach { $0.alpha = 0 }
+            allCollections.forEach {
+                $0.alpha = 0
+                $0.layer.zPosition = -1
+            }
         }
+
         if wasJump == -1 {
             transitionController?.progress = 0
             currentCollection = isAnimationUpscale ? transitionController?.fromCollection : transitionController?.toCollection
@@ -146,7 +150,6 @@ class GalleryGrid: UIView {
     }
 
     @objc private func onZoom() {
-        //print(globalScale)
         switch pinchGesture.state {
         case .began:
             guard
@@ -156,7 +159,16 @@ class GalleryGrid: UIView {
                 return
             }
 
-            zoomCellIndex = currentCollection.indexPathForItem(at: pinchGesture.location(in: currentCollection))!.item
+            allCollections.forEach {
+                $0.alpha = 0
+                $0.layer.zPosition = -1
+            }
+
+            let location = pinchGesture.location(in: currentCollection)
+            let currentLayout = currentCollection.collectionViewLayout as! GalleryLayout
+
+            zoomCellIndex = Int(location.y / currentLayout.cellSize) * currentLayout.countOfColumns + Int(location.x / currentLayout.cellSize)
+
             let nextCollection = pinchGesture.velocity > 0 ? getNextAfter(collection: currentCollection) : getNextBefore(collection: currentCollection)
             transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
             transitionController?.progress = pinchGesture.velocity > 0 ? 0 : 1
@@ -173,11 +185,17 @@ class GalleryGrid: UIView {
             pinchGesture.isEnabled = false
             lastVelocity = pinchGesture.velocity
 
+            if lastVelocity > 8 {
+                lastVelocity = 8
+            }
+
+            print(lastVelocity)
+
             let d = 0.25
-            let lastScale = getPerfectScale(for: pinchGesture.scale + (pinchGesture.velocity * d) / ((1 - d)))
+            let lastScale = getPerfectScale(for: pinchGesture.scale + (lastVelocity * d) / ((1 - d)))
             let deltaScale = lastScale - pinchGesture.scale
 
-            animator = ValueAnimator(duration: 0.5, animation: {[unowned self] progress in
+            animator = ValueAnimator(duration: 0.66, animation: {[unowned self] progress in
                 pinchGesture.scale = lastScale - ((1 - progress) * deltaScale)
                 aaa()
             }, curve: { x in
@@ -185,6 +203,7 @@ class GalleryGrid: UIView {
             }, complition: { [unowned self] isComplete in
                 self.transitionController!.progress = progress
 
+                //self.transitionController!.fromCollection.layer.zPosition = -1
                 if isAnimationUpscale {
                     if lastVelocity > 0 {
                         currentCollection = self.transitionController!.toCollection
@@ -200,10 +219,10 @@ class GalleryGrid: UIView {
                 }
 
                 self.transitionController = nil
-                animator = nil
                 localScale = globalScale
                 pinchGesture.scale = 1
                 pinchGesture.isEnabled = true
+                animator = nil
             })
 
             animator?.start()
@@ -211,6 +230,33 @@ class GalleryGrid: UIView {
         default:
             break
         }
+    }
+
+    func animateZoom(atIndex: Int) {
+//        zoomCellIndex = atIndex
+//        currentCollection = allCollections.last!
+//        let nextCollection = getNextAfter(collection: currentCollection)
+//        transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+//        lastScale = globalScale
+//        let deltaScale = 1.6
+//        print(localScale)
+//        print(deltaScale)
+//
+//        animator = ValueAnimator(duration: 0.5, animation: {[unowned self] progress in
+//            pinchGesture.scale =  1 + deltaScale * progress
+//            aaa()
+//        }, curve: { x in
+//            return 1 - pow(1 - x, 2)
+//        }, complition: { [unowned self] isComplete in
+//            self.transitionController!.progress = progress
+//            currentCollection = self.transitionController!.toCollection
+//
+//            self.transitionController = nil
+//            animator = nil
+//            localScale = globalScale
+//        })
+//
+//        animator?.start()
     }
 
     init(
@@ -229,14 +275,19 @@ class GalleryGrid: UIView {
             GalleryLayout(countOfColumns: 1),
             GalleryLayout(countOfColumns: 3),
             GalleryLayout(countOfColumns: 5),
-            GalleryLayout(countOfColumns: 13)
+            MultiGalleryLayout(countOfColumns: 13)
         ]
 
         for i in 0..<layouts.count {
             let collection = UICollectionView(frame: .zero, collectionViewLayout: layouts[i])
 
+            if i == layouts.count - 1 {
+                collection.register(MultiGalleryCell.self, forCellWithReuseIdentifier: "multi_photo")
+            } else {
+                collection.register(GalleryCell.self, forCellWithReuseIdentifier: "photo")
+            }
+
             collection.translatesAutoresizingMaskIntoConstraints = false
-            collection.register(GalleryCell.self, forCellWithReuseIdentifier: "photo")
             collection.delegate = delegate
             collection.dataSource = dataSource
             collection.clipsToBounds = false
