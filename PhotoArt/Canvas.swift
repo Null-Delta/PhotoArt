@@ -98,67 +98,6 @@ class Canvas: MTKView {
         wasStart = true
     }
 
-    func createNewSpline() {
-        lines.append(
-            BeizerSpline(
-                startPoint: .init(Float(points.first!.x), Float(points.first!.y)),
-                endPoint: .init(Float(points.first!.x), Float(points.first!.y)),
-                p1: .init(Float(points.first!.x), Float(points.first!.y)),
-                p2: .init(Float(points.first!.x), Float(points.first!.y)),
-                startSize: lines.last!.endSize,
-                endSize: lines.last!.endSize,
-                color: lines.last!.color
-            )
-        )
-
-        length = 0
-    }
-
-    func updateLastSpline() {
-        if wasStart && points.count >= 3 {
-            lines.append(
-                BeizerSpline(
-                    startPoint: .init(Float(points.first!.x), Float(points.first!.y)),
-                    endPoint: .init(Float(points.last!.x), Float(points.last!.y)),
-                    p1: .init(Float(points.last!.x), Float(points.last!.y)),
-                    p2: .init(Float(points.first!.x), Float(points.first!.y)),
-                    startSize: 0.1,
-                    endSize: 0.1,
-                    color: .init(Float.random(in: 0...1), Float.random(in: 0...1), Float.random(in: 0...1), 1)
-                )
-            )
-            _ = points.dropFirst(points.count - 1)
-            length = 0
-
-            createNewSpline()
-
-            wasStart = false
-
-            return
-        }
-
-        guard !wasStart, points.count > 3, lines.count > 1 else { return }
-
-        let p1 = normalize(
-            SIMD2<Float>(
-                Float(lines[lines.count - 2].p2.x - lines[lines.count - 2].endPoint.x),
-                Float(lines[lines.count - 2].p2.y - lines[lines.count - 2].endPoint.y)
-            )
-        ) * (length * 0.33)
-
-        let p2 = normalize(
-            SIMD2<Float>(
-                Float(points[points.count - 1].x - points[points.count - 2].x),
-                Float(points[points.count - 1].y - points[points.count - 2].y)
-            )
-        ) * (length * 0.33)
-
-        lines[lines.count - 1].endPoint = SIMD2<Float>(Float(points.last!.x), Float(points.last!.y))
-        lines[lines.count - 1].p1 = lines[lines.count - 1].startPoint - p1
-        lines[lines.count - 1].p2 = lines[lines.count - 1].endPoint - p2
-        lines[lines.count - 1].endSize = max(0.05, length / 10)
-    }
-
     lazy private var gesture: UILongPressGestureRecognizer = {
         let gest = UILongPressGestureRecognizer(target: self, action: #selector(onGesture))
         gest.minimumPressDuration = 0
@@ -181,13 +120,13 @@ class Canvas: MTKView {
 
             lines.append(
                 BeizerSpline(
-                    startPoint: .init(Float(points.first!.x), Float(points.first!.y)),
-                    endPoint: .init(Float(points.first!.x), Float(points.first!.y)),
-                    p1: .init(Float(points.first!.x), Float(points.first!.y)),
-                    p2: .init(Float(points.first!.x), Float(points.first!.y)),
-                    startSize: 0.1,
-                    endSize: 0.1,
-                    color: .init(Float.random(in: 0...1),Float.random(in: 0...1),Float.random(in: 0...1),1)
+                    startPoint: .init(Float(points[0].x), Float(points[0].y)),
+                    endPoint: .init(Float(points[0].x), Float(points[0].y)),
+                    p1: .init(Float(points[0].x), Float(points[0].y)),
+                    p2: .init(Float(points[0].x), Float(points[0].y)),
+                    startSize: 0.05,
+                    endSize: 0.05,
+                    color: .init(Float.random(in: 0...1), Float.random(in: 0...1), Float.random(in: 0...1), 0)
                 )
             )
 
@@ -202,32 +141,36 @@ class Canvas: MTKView {
             newPoint.y = (newPoint.y - frame.height / 2) / (frame.height / CGFloat(k))
             newPoint.y *= -CGFloat(2)
 
-            var deltaLength = simd.length(
-                SIMD2<Float>(
-                    Float(points.last!.x - newPoint.x),
-                    Float(points.last!.y - newPoint.y)
-                )
-            )
-
-            length += deltaLength
-
-            while(deltaLength > 0.5) {
-                let midPoint = CGPoint(x: (points.last!.x + newPoint.x) / 2, y: (points.last!.y + newPoint.y) / 2)
-                points.append(midPoint)
-                deltaLength /= 2
-            }
-
             points.append(newPoint)
 
-            if points.count >= 8 {
-                updateLastSpline()
+            if points.count == 2 && lines.count > 1 {
+                let midPoint = CGPoint(
+                    x: Double((lines.last!.p2.x + Float(points.last!.x))) / 2.0,
+                    y: Double((lines.last!.p2.y + Float(points.last!.y))) / 2.0
+                )
+
+                lines[lines.count - 1].endPoint = SIMD2<Float>(Float(midPoint.x), Float(midPoint.y))
+                points[0] = midPoint
+
+            } else if points.count == 4 {
+                length += simd.length(.init(Float(points[0].x - points[1].x), Float(points[0].y - points[1].y)))
+                length += simd.length(.init(Float(points[1].x - points[2].x), Float(points[1].y - points[2].y)))
+                length += simd.length(.init(Float(points[2].x - points[3].x), Float(points[2].y - points[3].y)))
+
+                lines.append(
+                    BeizerSpline(
+                        startPoint: .init(Float(points[0].x), Float(points[0].y)),
+                        endPoint: .init(Float(points[3].x), Float(points[3].y)),
+                        p1: .init(Float(points[1].x), Float(points[1].y)),
+                        p2: .init(Float(points[2].x), Float(points[2].y)),
+                        startSize: lines.last!.endSize,
+                        endSize: max(0.05, length / 5),
+                        color: lines.last!.color
+                    )
+                )
 
                 points.removeAll()
-                points.append(newPoint)
-
-                createNewSpline()
-            } else {
-                updateLastSpline()
+                length = 0
             }
             break
 
