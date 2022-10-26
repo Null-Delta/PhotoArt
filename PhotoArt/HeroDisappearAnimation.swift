@@ -28,7 +28,7 @@ class HeroDisappearAnimation: NSObject, UIViewControllerAnimatedTransitioning {
             let controller = transitionContext.viewController(forKey: .from) as? EditorViewController
         else { return }
 
-        let canvas = controller.view.subviews[0] as! PKCanvasView
+        let canvas = controller.view.subviews[0] as! UIScrollView
         let offset = canvas.contentOffset
         print(offset)
 

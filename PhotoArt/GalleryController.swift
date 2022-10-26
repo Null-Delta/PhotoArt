@@ -166,7 +166,7 @@ extension GalleryController: UICollectionViewDataSource {
         var imageSize: CGSize = CGSize(width: layout.cellSize, height: layout.cellSize)
 
         if layout is MultiGalleryLayout {
-            imageSize = CGSize(width: imageSize.width / 5, height: imageSize.height / 5)
+            imageSize = CGSize(width: 8, height: 8)
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "multi_photo", for: indexPath) as! MultiGalleryCell
             cell.clearImages()
             

@@ -106,8 +106,6 @@ class Switcher: UIView {
         didSet {
             guard oldValue != selection else { return }
 
-            onSelectionChanged(selection)
-
             if selection == 0 {
                 NSLayoutConstraint.activate([ leftSelectionConstraint ])
                 NSLayoutConstraint.deactivate([ rightSelectionConstraint ])
@@ -138,7 +136,7 @@ class Switcher: UIView {
         highlightView.centerYAnchor.constraint(equalTo: centerYAnchor),
     ]
 
-    private var onSelectionChanged: (Int) -> Void
+    private var onSelectionChanged: (Int, Bool) -> Void
     private var onSliderChanged: (CGFloat) -> Void
 
     lazy private var firstLabel: UILabel = {
@@ -199,6 +197,7 @@ class Switcher: UIView {
 
     @objc private func onTap() {
         selection = tapGesture.location(in: self).x < bounds.width / 2 ? 0 : 1
+        onSelectionChanged(selection, true)
     }
 
     @objc private func onSlide() {
@@ -218,7 +217,7 @@ class Switcher: UIView {
     }
 
     init(
-        onSelectionChanged: @escaping (Int) -> Void,
+        onSelectionChanged: @escaping (Int, Bool) -> Void,
         onSliderChanged: @escaping (CGFloat) -> Void
     ) {
         self.onSelectionChanged = onSelectionChanged

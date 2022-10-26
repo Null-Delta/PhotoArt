@@ -27,4 +27,8 @@ extension CGPoint {
     static func /(lp: CGPoint, rv: CGFloat) -> CGPoint {
         return CGPoint(x: lp.x / rv, y: lp.y / rv)
     }
+
+    func toSIMD() -> SIMD2<Float> {
+        return SIMD2<Float>(Float(x), Float(y))
+    }
 }

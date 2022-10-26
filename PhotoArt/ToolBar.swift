@@ -18,9 +18,40 @@ class ToolBar: UIView {
 
     var onToolUpdate: (PKTool) -> Void = { _ in }
     var onEditorExit: () -> Void = { }
+    var onTextStyleChange: (TextStyle, NSTextAlignment, UIColor) -> Void = { _, _, _ in }
+    var onTextInputStart: () -> Void = { }
 
-    private var state: ToolBarState = .draw {
+    func setText(text: Text) {
+        textStyleButton.style = text.style
+        textAlignmentButton.alignment = text.alignment
+        colorBtn.color = text.color
+        state = .text
+        switcher.selection = 1
+
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8) { [unowned self] in
+            layoutIfNeeded()
+        }
+    }
+
+    var state: ToolBarState = .draw {
         didSet {
+            if oldValue == .text && state != .text {
+                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8) { [unowned self] in
+                    textStyleButton.alpha = 0
+                    textAlignmentButton.alpha = 0
+                    tools.forEach { tool in tool.showTool() }
+                }
+            }
+
+            if oldValue == .text && state == .draw {
+                guard let tool = tools[selectedTool] as? DefaultDrawTool else { return }
+                colorBtn.color = tool.color
+                switcher.selection = 0
+                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8) { [unowned self] in
+                    layoutIfNeeded()
+                }
+            }
+
             if state == .editing {
                 switcher.state = .slider
                 tools[selectedTool].state = .centerized
@@ -46,6 +77,12 @@ class ToolBar: UIView {
                     colorBtn.alpha = 1
                     layoutIfNeeded()
                     tools[selectedTool].transform = CGAffineTransform(translationX: 0, y: -16)
+                }
+            } else if state == .text && oldValue != state {
+                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8) { [unowned self] in
+                    tools.forEach{ tool in tool.hideTool() }
+                    textStyleButton.alpha = 1
+                    textAlignmentButton.alpha = 1
                 }
             }
         }
@@ -84,6 +121,27 @@ class ToolBar: UIView {
         return blur
     }()
 
+    lazy private var textStyleButton: TextStyleButton = {
+        let btn = TextStyleButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.onStyleChange = { [unowned self] style in
+            onTextStyleChange(style, textAlignmentButton.alignment, colorBtn.color)
+        }
+
+        return btn
+    }()
+
+    lazy private var textAlignmentButton: TextAlignmentButton = {
+        let btn = TextAlignmentButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+
+        btn.onAlignmentChange = { [unowned self] alignment in
+            onTextStyleChange(textStyleButton.style, alignment, colorBtn.color)
+        }
+
+        return btn
+    }()
+
     lazy private var exitBtn: UIButton = {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -104,15 +162,50 @@ class ToolBar: UIView {
         return btn
     }()
 
+    lazy private var paramsBar: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isUserInteractionEnabled = true
+        
+        view.addSubview(textStyleButton)
+        view.addSubview(textAlignmentButton)
+        view.addSubview(colorBtn)
+
+        NSLayoutConstraint.activate([
+            colorBtn.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0),
+            colorBtn.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8),
+            colorBtn.widthAnchor.constraint(equalToConstant: 32),
+            colorBtn.heightAnchor.constraint(equalToConstant: 32),
+
+            textStyleButton.heightAnchor.constraint(equalToConstant: 32),
+            textStyleButton.widthAnchor.constraint(equalToConstant: 32),
+            textStyleButton.leftAnchor.constraint(equalTo: colorBtn.rightAnchor, constant: 16),
+            textStyleButton.centerYAnchor.constraint(equalTo: colorBtn.centerYAnchor),
+
+            textAlignmentButton.heightAnchor.constraint(equalToConstant: 32),
+            textAlignmentButton.widthAnchor.constraint(equalToConstant: 32),
+            textAlignmentButton.leftAnchor.constraint(equalTo: textStyleButton.rightAnchor, constant: 16),
+            textAlignmentButton.centerYAnchor.constraint(equalTo: colorBtn.centerYAnchor),
+
+            view.heightAnchor.constraint(equalToConstant: 48)
+        ])
+
+        return view
+    }()
+
     lazy private var colorBtn: ColorButton = {
         let btn = ColorButton(
             onColorCanged: {[unowned self] newColor in
-                if tools[selectedTool] is (any DrawTool) {
-                    var drawTool = tools[selectedTool] as! (any DrawTool)
+                if state == .draw {
+                    if tools[selectedTool] is (any DrawTool) {
+                        var drawTool = tools[selectedTool] as! (any DrawTool)
 
-                    drawTool.color = newColor
+                        drawTool.color = newColor
+                    }
+                    onToolUpdate((self.tools[self.selectedTool] as! DefaultDrawTool).currentTool)
+                } else {
+                    onTextStyleChange(textStyleButton.style, textAlignmentButton.alignment, newColor)
                 }
-                onToolUpdate((self.tools[self.selectedTool] as! DefaultDrawTool).currentTool)
             }
         )
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -121,7 +214,12 @@ class ToolBar: UIView {
     }()
 
     lazy private var switcher: Switcher = {
-        let switcher = Switcher(onSelectionChanged: { _ in
+        let switcher = Switcher(onSelectionChanged: { [unowned self] selection, isUserInteraction in
+            state = selection == 0 ? .draw : .text
+
+            if selection == 1 && isUserInteraction {
+                onTextInputStart()
+            }
 
         }, onSliderChanged: { newSize in
             (self.tools[self.selectedTool] as! DefaultDrawTool).width = 4 + newSize * 30
@@ -216,8 +314,8 @@ class ToolBar: UIView {
                 case .selected:
                     if tools[toolIndex] is DefaultDrawTool {
                         switcher.sliderPosition = ((tools[toolIndex] as! DefaultDrawTool).width - 4) / 30
+                        state = .editing
                     }
-                    state = .editing
 
                 case .centerized:
                     break
@@ -238,7 +336,7 @@ class ToolBar: UIView {
     @objc private func onExitClick() {
         if state == .editing {
             state = .draw
-        } else if state == .draw {
+        } else {
             onEditorExit()
         }
     }
@@ -254,6 +352,7 @@ class ToolBar: UIView {
         toolsContainer.layer.mask = toolsMask
         blurView.layer.mask = backgroundMask
         blurView.layer.insertSublayer(gradient, at: 0)
+
     }
 
     init() {
@@ -263,8 +362,11 @@ class ToolBar: UIView {
         addSubview(exitBtn)
         addSubview(backBtn)
         addSubview(toolsContainer)
+        addSubview(paramsBar)
 
-        addSubview(colorBtn)
+        textStyleButton.alpha = 0
+        textAlignmentButton.alpha = 0
+
         addSubview(switcher)
 
         NSLayoutConstraint.activate([
@@ -277,11 +379,6 @@ class ToolBar: UIView {
             backBtn.rightAnchor.constraint(equalTo: rightAnchor, constant: -8),
             backBtn.widthAnchor.constraint(equalToConstant: 32),
             backBtn.heightAnchor.constraint(equalToConstant: 32),
-
-            colorBtn.bottomAnchor.constraint(equalTo: exitBtn.topAnchor, constant: -16),
-            colorBtn.leftAnchor.constraint(equalTo: leftAnchor, constant: 8),
-            colorBtn.widthAnchor.constraint(equalToConstant: 32),
-            colorBtn.heightAnchor.constraint(equalToConstant: 32),
 
             blurView.topAnchor.constraint(equalTo: topAnchor, constant: 0),
             blurView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0),
@@ -297,6 +394,10 @@ class ToolBar: UIView {
             toolsContainer.rightAnchor.constraint(equalTo: switcher.rightAnchor),
             toolsContainer.bottomAnchor.constraint(equalTo: switcher.topAnchor),
             toolsContainer.heightAnchor.constraint(equalToConstant: 56),
+
+            paramsBar.leftAnchor.constraint(equalTo: leftAnchor),
+            paramsBar.rightAnchor.constraint(equalTo: rightAnchor),
+            paramsBar.bottomAnchor.constraint(equalTo: backBtn.topAnchor, constant: -8),
         ])
     }
 

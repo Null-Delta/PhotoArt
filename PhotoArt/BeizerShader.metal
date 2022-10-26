@@ -25,24 +25,22 @@ struct VertexOut {
     float4 color;
 };
 
-vertex VertexOut bezierVertex(constant BeizerSpline *allParams[[buffer(0)]],
-                              constant float &k [[buffer(1)]],
-                               uint vertexId[[vertex_id]],
-                               uint instanceId[[instance_id]])
-{
-    float t = (float) floor(vertexId / 2.0) / 200.0 * 2.0;
+float2 pointForCap(float2 center, float radius, float progress, int vertexId) {
+    return vertexId % 2 == 0 ? center : center + float2(sin(progress * M_PI_F * 2), -cos(progress * M_PI_F * 2)) * radius;
+}
 
-    BeizerSpline params = allParams[instanceId];
+float2 pointForLine(BeizerSpline spline, float progress, int vertexId) {
+    float t = progress;
 
-    float deltaSize = params.endSize - params.startSize;
+    float deltaSize = spline.endSize - spline.startSize;
 
-    float lineWidth = (1 - (((float) (vertexId % 2)) * 2.0)) * (params.startSize + deltaSize * t);
+    float lineWidth = (1 - (((float) (vertexId % 2)) * 2.0)) * (spline.startSize + deltaSize * t);
 
-    float2 a = params.startPoint;
-    float2 b = params.endPoint;
+    float2 a = spline.startPoint;
+    float2 b = spline.endPoint;
 
-    float2 p1 = params.p1 * 3.0;
-    float2 p2 = params.p2 * 3.0;
+    float2 p1 = spline.p1 * 3.0;
+    float2 p2 = spline.p2 * 3.0;
 
     float nt = 1.0f - t;
 
@@ -57,12 +55,29 @@ vertex VertexOut bezierVertex(constant BeizerSpline *allParams[[buffer(0)]],
 
     tangent = normalize(float2(-tangent.y, tangent.x));
 
+    return point + (tangent * (lineWidth / 2.0));
+}
+
+vertex VertexOut bezierVertex(constant BeizerSpline *allParams[[buffer(0)]],
+                              constant float &k [[buffer(1)]],
+                               uint vertexId[[vertex_id]],
+                               uint instanceId[[instance_id]]) {
+    const uint pointsPerCap = 100;
+    const uint pointsPerLine = 200;
+    BeizerSpline curve = allParams[instanceId];
+
+    float2 point = vertexId < pointsPerCap ?
+    pointForCap(curve.startPoint, curve.startSize / 2.0, vertexId / (float)(pointsPerCap - 2), vertexId) :
+    vertexId > pointsPerCap + pointsPerLine ?
+    pointForCap(curve.endPoint, curve.endSize / 2.0, (vertexId - pointsPerCap - pointsPerLine) / (float)(pointsPerCap - 2), vertexId) :
+    pointForLine(curve, (vertexId - pointsPerCap) / (float)(pointsPerLine), vertexId);
+
     VertexOut vo;
 
-    vo.pos.xy = point + (tangent * (lineWidth / 2.0f));
+    vo.pos.xy = point;
     vo.pos.y /= k;
     vo.pos.zw = float2(0, 1);
-    vo.color = params.color;
+    vo.color = curve.color;
 
     return vo;
 }
@@ -73,30 +88,28 @@ fragment half4 bezierFragment(VertexOut params[[stage_in]])
 }
 
 
-vertex VertexOut bezierDebugVertex(constant BeizerSpline *allParams[[buffer(0)]],
+vertex VertexOut bezierCapVertex(constant BeizerSpline *allParams[[buffer(0)]],
                               constant float &k [[buffer(1)]],
                                uint vertexId[[vertex_id]],
                                uint instanceId[[instance_id]])
 {
-    BeizerSpline params = allParams[instanceId];
+    float width = instanceId % 2 == 0 ? allParams[instanceId / 2].startSize : allParams[instanceId / 2].endSize;
+    float2 point = instanceId % 2 == 0 ? allParams[instanceId / 2].startPoint : allParams[instanceId / 2].endPoint;
 
-    float2 point = vertexId == 0 ? params.startPoint : 0;
-    point = vertexId == 1 ? params.p1 : point;
+    float angle = (vertexId / 49.0) * M_PI_F * 2;
 
-    point = vertexId == 2 ? params.p2 : point;
-    point = vertexId == 3 ? params.endPoint : point;
+    float2 position = vertexId % 2 == 0 ? point : point + float2(sin(angle), -cos(angle)) * width / 2;
 
     VertexOut vo;
-
-    vo.pos.xy = point;
+    vo.pos.xy = position;
     vo.pos.y /= k;
     vo.pos.zw = float2(0, 1);
-    vo.color = params.color;
+    vo.color = allParams[instanceId / 2].color;
 
     return vo;
 }
 
-fragment half4 bezierDebugFragment(VertexOut params[[stage_in]])
+fragment half4 bezierCapFragment(VertexOut params[[stage_in]])
 {
-    return half4(0,1,0,1);
+    return half4(params.color);
 }

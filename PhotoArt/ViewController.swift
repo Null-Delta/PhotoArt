@@ -11,24 +11,25 @@ import MetalKit
 
 class ViewController: UIViewController {
 
-    lazy private var canvas: Canvas = {
-        let canvas = Canvas(frame: .zero, device: MetalContext.device)
-
-        canvas.translatesAutoresizingMaskIntoConstraints = false
-        return canvas
+    lazy private var textView: TextView = {
+        let view = TextView(text: "AAA\nAAAA\nsome body\nccc\ndddddddd")
+        return view
     }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .black
         // Do any additional setup after loading the view.
 
-        view.addSubview(canvas)
+        view.addSubview(textView)
+        textView.frame = view.bounds
 
-        NSLayoutConstraint.activate([
-            canvas.leftAnchor.constraint(equalTo: view.leftAnchor),
-            canvas.rightAnchor.constraint(equalTo: view.rightAnchor),
-            canvas.topAnchor.constraint(equalTo: view.topAnchor),
-            canvas.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
+//        NSLayoutConstraint.activate([
+//            canvas.leftAnchor.constraint(equalTo: view.leftAnchor),
+//            canvas.rightAnchor.constraint(equalTo: view.rightAnchor),
+//            canvas.topAnchor.constraint(equalTo: view.topAnchor),
+//            canvas.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+//        ])
     }
 }
 

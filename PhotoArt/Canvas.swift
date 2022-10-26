@@ -15,10 +15,10 @@ class Canvas: MTKView {
     private var pipelineDescriptor = MTLRenderPipelineDescriptor()
     private var pipelineState: MTLRenderPipelineState!
 
-    private var pipelineDebugDescriptor = MTLRenderPipelineDescriptor()
-    private var pipelineDebugState: MTLRenderPipelineState!
     private var vertexBuffer: MTLBuffer!
     private var k: Float = 0
+    var penScale: Float = 1
+    var penColor: UIColor = .white
 
     var lines: [BeizerSpline] = [
 
@@ -39,9 +39,9 @@ class Canvas: MTKView {
     }
 
     private func configureWithDevice(_ device: MTLDevice) {
-        self.clearColor = MTLClearColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
-        //self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.framebufferOnly = true
+        self.clearColor = MTLClearColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.0)
+
+        //self.framebufferOnly = true
         self.colorPixelFormat = .bgra8Unorm
 
 
@@ -59,44 +59,19 @@ class Canvas: MTKView {
             library = device?.makeDefaultLibrary()
             pipelineDescriptor.vertexFunction = library?.makeFunction(name: "bezierVertex")
             pipelineDescriptor.fragmentFunction = library?.makeFunction(name: "bezierFragment")
-            pipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
-
-            pipelineDebugDescriptor.vertexFunction = library?.makeFunction(name: "bezierDebugVertex")
-            pipelineDebugDescriptor.fragmentFunction = library?.makeFunction(name: "bezierDebugFragment")
-            pipelineDebugDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+            pipelineDescriptor.colorAttachments[0].pixelFormat = self.colorPixelFormat
 
             // Run with 4x MSAA:
             pipelineDescriptor.sampleCount = 4
-            pipelineDebugDescriptor.sampleCount = 4
 
             do {
                 try pipelineState = device?.makeRenderPipelineState(descriptor: pipelineDescriptor)
-                try pipelineDebugState = device?.makeRenderPipelineState(descriptor: pipelineDebugDescriptor)
             } catch {}
         }
     }
 
-    private var firstPoint: CGPoint = .zero
-    private var lastPoint: CGPoint = .zero
-
     private var length: Float = 0
-    private var wasStart: Bool = true
-
     private var points: [CGPoint] = []
-
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        var startPoint = touches.first!.location(in: self)
-        startPoint.x /= frame.width / 2
-        startPoint.x -= 1
-
-        startPoint.y = (startPoint.y - frame.height / 2) / (frame.height / CGFloat(k))
-        startPoint.y *= -CGFloat(k)
-
-        points.removeAll()
-        points.append(startPoint)
-        length = 0
-        wasStart = true
-    }
 
     lazy private var gesture: UILongPressGestureRecognizer = {
         let gest = UILongPressGestureRecognizer(target: self, action: #selector(onGesture))
@@ -105,45 +80,49 @@ class Canvas: MTKView {
         return gest
     }()
 
+    private func convert(point: CGPoint) -> CGPoint {
+        var result = point// - self.convert(frame.origin, to: nil)
+        print(point)
+        print(frame.width)
+        result.x /= frame.width / 2
+        result.x -= 1
+
+        result.y /= frame.width / 2
+        result.y -= 1 * CGFloat(k)
+        result.y *= -1
+
+        print(result)
+        return result
+    }
+
     @objc private func onGesture() {
         switch gesture.state {
         case .began:
-            var startPoint = gesture.location(in: self)
-            startPoint.x /= frame.width / 2
-            startPoint.x -= 1
-
-            startPoint.y = (startPoint.y - frame.height / 2) / (frame.height / CGFloat(k))
-            startPoint.y *= -CGFloat(k)
+            let startPoint = convert(point: gesture.location(in: self))
 
             points.removeAll()
             points.append(startPoint)
 
             lines.append(
                 BeizerSpline(
-                    startPoint: .init(Float(points[0].x), Float(points[0].y)),
-                    endPoint: .init(Float(points[0].x), Float(points[0].y)),
-                    p1: .init(Float(points[0].x), Float(points[0].y)),
-                    p2: .init(Float(points[0].x), Float(points[0].y)),
-                    startSize: 0.05,
-                    endSize: 0.05,
-                    color: .init(Float.random(in: 0...1), Float.random(in: 0...1), Float.random(in: 0...1), 0)
+                    startPoint: points[0].toSIMD(),
+                    endPoint: points[0].toSIMD(),
+                    p1: points[0].toSIMD(),
+                    p2: points[0].toSIMD(),
+                    startSize: 0.05 * penScale,
+                    endSize: 0.05 * penScale,
+                    color: .init(Float(penColor.r),Float(penColor.g), Float(penColor.b), 1)
                 )
             )
 
             length = 0
-            wasStart = true
-            break
 
         case .changed:
-            var newPoint = gesture.location(in: self)
-            newPoint.x /= frame.width / 2
-            newPoint.x -= 1
-            newPoint.y = (newPoint.y - frame.height / 2) / (frame.height / CGFloat(k))
-            newPoint.y *= -CGFloat(2)
+            let newPoint = convert(point: gesture.location(in: self))
 
             points.append(newPoint)
 
-            if points.count == 2 && lines.count > 1 {
+            if points.count == 2 && lines.count > 0 {
                 let midPoint = CGPoint(
                     x: Double((lines.last!.p2.x + Float(points.last!.x))) / 2.0,
                     y: Double((lines.last!.p2.y + Float(points.last!.y))) / 2.0
@@ -152,28 +131,46 @@ class Canvas: MTKView {
                 lines[lines.count - 1].endPoint = SIMD2<Float>(Float(midPoint.x), Float(midPoint.y))
                 points[0] = midPoint
 
-            } else if points.count == 4 {
-                length += simd.length(.init(Float(points[0].x - points[1].x), Float(points[0].y - points[1].y)))
-                length += simd.length(.init(Float(points[1].x - points[2].x), Float(points[1].y - points[2].y)))
-                length += simd.length(.init(Float(points[2].x - points[3].x), Float(points[2].y - points[3].y)))
-
                 lines.append(
                     BeizerSpline(
-                        startPoint: .init(Float(points[0].x), Float(points[0].y)),
-                        endPoint: .init(Float(points[3].x), Float(points[3].y)),
-                        p1: .init(Float(points[1].x), Float(points[1].y)),
-                        p2: .init(Float(points[2].x), Float(points[2].y)),
-                        startSize: lines.last!.endSize,
-                        endSize: max(0.05, length / 5),
-                        color: lines.last!.color
+                        startPoint: points[0].toSIMD(),
+                        endPoint: points[1].toSIMD(),
+                        p1: points[1].toSIMD(),
+                        p2: points[0].toSIMD(),
+                        startSize: lines[lines.count - 1].endSize,
+                        endSize: lines[lines.count - 1].endSize,
+                        color: lines[lines.count - 1].color
                     )
                 )
+            } else if points.count == 3 {
+                lines[lines.count - 1].endPoint = points[2].toSIMD()
+                lines[lines.count - 1].p1 = points[1].toSIMD()
+                lines[lines.count - 1].p2 = points[1].toSIMD()
+
+                length = 0
+                length += simd.length((points[0] - points[1]).toSIMD())
+                length += simd.length((points[1] - points[2]).toSIMD())
+
+                lines[lines.count - 1].endSize = max(0.05, length / 5) * penScale
+
+            } else if points.count == 4 {
+                length = 0
+                length += simd.length((points[0] - points[1]).toSIMD())
+                length += simd.length((points[1] - points[2]).toSIMD())
+                length += simd.length((points[2] - points[3]).toSIMD())
+
+                lines[lines.count - 1].endPoint = points[3].toSIMD()
+                lines[lines.count - 1].p1 = points[1].toSIMD()
+                lines[lines.count - 1].p2 = points[2].toSIMD()
+                lines[lines.count - 1].endSize = max(0.05, length / 5) * penScale
 
                 points.removeAll()
                 length = 0
             }
-            break
 
+        case .ended:
+            
+            break
         default:
             break
         }
@@ -186,15 +183,14 @@ class Canvas: MTKView {
             let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor)
         else { return }
 
-
-        k = Float(rect.height) / Float(rect.width)
+        k = Float(frame.height) / Float(frame.width)
 
         if lines.count > 0 {
-            renderEncoder.setRenderPipelineState(pipelineState)
             renderEncoder.setVertexBuffer(device.makeBuffer(bytes: lines, length: MemoryLayout<BeizerSpline>.stride * lines.count), offset: 0, index: 0)
             renderEncoder.setVertexBuffer(device.makeBuffer(bytes: &k, length: MemoryLayout<Float>.stride), offset: 0, index: 1)
 
-            renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 202, instanceCount: lines.count)
+            renderEncoder.setRenderPipelineState(pipelineState)
+            renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 400, instanceCount: lines.count)
         }
 
         renderEncoder.endEncoding()

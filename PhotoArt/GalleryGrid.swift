@@ -168,6 +168,13 @@ class GalleryGrid: UIView {
             let currentLayout = currentCollection.collectionViewLayout as! GalleryLayout
 
             zoomCellIndex = Int(location.y / currentLayout.cellSize) * currentLayout.countOfColumns + Int(location.x / currentLayout.cellSize)
+            if zoomCellIndex < 0 {
+                zoomCellIndex = 0
+            }
+            //TODO: учесть мультиячейки
+//            else if zoomCellIndex > currentCollection.numberOfItems(inSection: 0) - 1 {
+//                zoomCellIndex = currentCollection.numberOfItems(inSection: 0) - 1
+//            }
 
             let nextCollection = pinchGesture.velocity > 0 ? getNextAfter(collection: currentCollection) : getNextBefore(collection: currentCollection)
             transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)

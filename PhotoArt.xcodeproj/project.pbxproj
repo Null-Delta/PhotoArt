@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		862947E9290872CD00391E55 /* EditMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947E8290872CD00391E55 /* EditMenu.swift */; };
+		862947EB29087C2D00391E55 /* TextStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947EA29087C2D00391E55 /* TextStyleButton.swift */; };
+		862947F12908800800391E55 /* TextAlignmentButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947F02908800800391E55 /* TextAlignmentButton.swift */; };
+		862947F32908924400391E55 /* TextInputController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947F22908924400391E55 /* TextInputController.swift */; };
 		863793BC28F9776800C64A82 /* AccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793BB28F9776800C64A82 /* AccessController.swift */; };
 		863793BF28F978F200C64A82 /* AccessTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */; };
 		863793C128F9790E00C64A82 /* AccessDisappearAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */; };
@@ -47,6 +51,7 @@
 		86B0783928FC652800B4EB3F /* CGRect+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B0783828FC652800B4EB3F /* CGRect+Extensions.swift */; };
 		86B0783B28FC7E9A00B4EB3F /* ValueAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B0783A28FC7E9A00B4EB3F /* ValueAnimator.swift */; };
 		86B0784028FD85A200B4EB3F /* GalleryGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B0783F28FD85A200B4EB3F /* GalleryGrid.swift */; };
+		86C40F5F29057358003C8573 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C40F5E29057358003C8573 /* TextView.swift */; };
 		86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3428FB2BA4006819F5 /* Interpolation.swift */; };
 		86EA1A3728FB4254006819F5 /* CollectionTransitionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */; };
 		86EA1A3928FC51C0006819F5 /* CGSize+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EA1A3828FC51C0006819F5 /* CGSize+Extensions.swift */; };
@@ -57,6 +62,10 @@
 		1F25F0C493D7197053E34138 /* Pods-PhotoArt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoArt.debug.xcconfig"; path = "Target Support Files/Pods-PhotoArt/Pods-PhotoArt.debug.xcconfig"; sourceTree = "<group>"; };
 		2BAD913032522E57EF9FE9E4 /* Pods-PhotoArt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoArt.release.xcconfig"; path = "Target Support Files/Pods-PhotoArt/Pods-PhotoArt.release.xcconfig"; sourceTree = "<group>"; };
 		34E52F59859C888902F45C0D /* Pods_PhotoArt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoArt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		862947E8290872CD00391E55 /* EditMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMenu.swift; sourceTree = "<group>"; };
+		862947EA29087C2D00391E55 /* TextStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyleButton.swift; sourceTree = "<group>"; };
+		862947F02908800800391E55 /* TextAlignmentButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAlignmentButton.swift; sourceTree = "<group>"; };
+		862947F22908924400391E55 /* TextInputController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputController.swift; sourceTree = "<group>"; };
 		863793BB28F9776800C64A82 /* AccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessController.swift; sourceTree = "<group>"; };
 		863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessTransitioningDelegate.swift; sourceTree = "<group>"; };
 		863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessDisappearAnimation.swift; sourceTree = "<group>"; };
@@ -99,6 +108,7 @@
 		86B0783828FC652800B4EB3F /* CGRect+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+Extensions.swift"; sourceTree = "<group>"; };
 		86B0783A28FC7E9A00B4EB3F /* ValueAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueAnimator.swift; sourceTree = "<group>"; };
 		86B0783F28FD85A200B4EB3F /* GalleryGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryGrid.swift; sourceTree = "<group>"; };
+		86C40F5E29057358003C8573 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		86EA1A3428FB2BA4006819F5 /* Interpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interpolation.swift; sourceTree = "<group>"; };
 		86EA1A3628FB4254006819F5 /* CollectionTransitionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionTransitionController.swift; sourceTree = "<group>"; };
 		86EA1A3828FC51C0006819F5 /* CGSize+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGSize+Extensions.swift"; sourceTree = "<group>"; };
@@ -198,11 +208,13 @@
 		8699625428F3612A00F3850F /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				86C40F5D29057343003C8573 /* TextEditor */,
 				8658A7862901E5020070C893 /* Actions */,
 				8699626428F4187F00F3850F /* ToolBar */,
 				8699625228F3611C00F3850F /* EditorViewController.swift */,
 				8699626228F378B600F3850F /* EditorNavigationBar.swift */,
 				8658A78B2901EC7E0070C893 /* Canvas.swift */,
+				862947E8290872CD00391E55 /* EditMenu.swift */,
 			);
 			name = Editor;
 			sourceTree = "<group>";
@@ -228,6 +240,8 @@
 				8699626528F4188900F3850F /* ToolBar.swift */,
 				868C5D2628F5992A0064FD18 /* ColorButton.swift */,
 				8668D71A28F751B300A2E72E /* Switcher.swift */,
+				862947EA29087C2D00391E55 /* TextStyleButton.swift */,
+				862947F02908800800391E55 /* TextAlignmentButton.swift */,
 			);
 			name = ToolBar;
 			sourceTree = "<group>";
@@ -263,6 +277,15 @@
 				86B0783A28FC7E9A00B4EB3F /* ValueAnimator.swift */,
 			);
 			name = Animator;
+			sourceTree = "<group>";
+		};
+		86C40F5D29057343003C8573 /* TextEditor */ = {
+			isa = PBXGroup;
+			children = (
+				86C40F5E29057358003C8573 /* TextView.swift */,
+				862947F22908924400391E55 /* TextInputController.swift */,
+			);
+			name = TextEditor;
 			sourceTree = "<group>";
 		};
 		900C3E6A7A905EC53CF955F7 /* Pods */ = {
@@ -400,8 +423,10 @@
 				863793C128F9790E00C64A82 /* AccessDisappearAnimation.swift in Sources */,
 				8668D72028F75ADB00A2E72E /* PencilTool.swift in Sources */,
 				8699624328F3602900F3850F /* ViewController.swift in Sources */,
+				86C40F5F29057358003C8573 /* TextView.swift in Sources */,
 				86A4817228F899D900207D58 /* GalleryCell.swift in Sources */,
 				86EA1A3928FC51C0006819F5 /* CGSize+Extensions.swift in Sources */,
+				862947F12908800800391E55 /* TextAlignmentButton.swift in Sources */,
 				86A4817E28F9588B00207D58 /* UIVisualEffect+Extensions.swift in Sources */,
 				8699623F28F3602900F3850F /* AppDelegate.swift in Sources */,
 				8668D72A28F8106100A2E72E /* DefaultTool.swift in Sources */,
@@ -414,7 +439,9 @@
 				86A4817C28F951F200207D58 /* GalleryLayout.swift in Sources */,
 				8668D72828F77B0F00A2E72E /* EraseTool.swift in Sources */,
 				86EA1A3728FB4254006819F5 /* CollectionTransitionController.swift in Sources */,
+				862947EB29087C2D00391E55 /* TextStyleButton.swift in Sources */,
 				863793BF28F978F200C64A82 /* AccessTransitioningDelegate.swift in Sources */,
+				862947F32908924400391E55 /* TextInputController.swift in Sources */,
 				8699624128F3602900F3850F /* SceneDelegate.swift in Sources */,
 				8699626828F418CA00F3850F /* UIImage+Extensions.swift in Sources */,
 				8668D72E28F82BB700A2E72E /* LassoTool.swift in Sources */,
@@ -423,6 +450,7 @@
 				8699626328F378B600F3850F /* EditorNavigationBar.swift in Sources */,
 				86A4817628F89E8700207D58 /* HeroTransitioningDelegate.swift in Sources */,
 				8668D71928F73BAD00A2E72E /* UIColor+Extensions.swift in Sources */,
+				862947E9290872CD00391E55 /* EditMenu.swift in Sources */,
 				8668D72428F7722E00A2E72E /* BrushTool.swift in Sources */,
 				86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */,
 				8693FBDB2901696800A3CE21 /* MultiGalleryLayout.swift in Sources */,
@@ -584,8 +612,7 @@
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Need photos";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -617,8 +644,7 @@
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Need photos";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
