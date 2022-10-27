@@ -18,6 +18,7 @@ class TextInputController: UIViewController {
         btn.setTitle("Cancel", for: .normal)
 
         btn.tintColor = .white
+        btn.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.addTarget(self, action: #selector(onExit), for: .touchUpInside)
 
@@ -30,10 +31,29 @@ class TextInputController: UIViewController {
         btn.setTitle("Done", for: .normal)
 
         btn.tintColor = .white
+        btn.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.addTarget(self, action: #selector(onDone), for: .touchUpInside)
 
         return btn
+    }()
+
+    lazy private var slider: FontSizeSlider = {
+        let slider = FontSizeSlider()
+        slider.translatesAutoresizingMaskIntoConstraints = false
+        slider.onChange = { [unowned self] size in
+
+            print(size)
+            textView.font = .systemFont(ofSize: size * 40 + 8)
+            textView.setNeedsLayout()
+            textView.layoutIfNeeded()
+            
+            textPreview.texts[0].font = .systemFont(ofSize: size * 40 + 8)
+            textPreview.texts[0].text = lines.map({ $0 == "" ? " " : $0 }).joined(separator: "\n")
+            textPreview.draw(view.bounds)
+
+        }
+        return slider
     }()
 
     lazy private var textView: UITextView = {
@@ -145,11 +165,9 @@ class TextInputController: UIViewController {
         textView.selectedRange = NSRange(location: 0, length: 0)
 
         while currentPosition != textView.text.count {
-            print("here")
             if textView.text[textView.text.index(textView.text.startIndex, offsetBy: currentPosition)] == "\n" {
                 currentPosition += 1
                 textView.selectedRange = NSRange(location: currentPosition, length: 0)
-                //continue
             }
 
             let currentPositionLabel = textView.selectedTextRange!.start
@@ -207,7 +225,7 @@ class TextInputController: UIViewController {
     init(text: Text? = nil) {
         super.init(nibName: nil, bundle: nil)
 
-        textPreview.texts[0] = text ?? Text(text: "", center: .zero)
+        textPreview.texts[0] = text ?? Text(text: "", font: .systemFont(ofSize: 24), center: .zero)
         textPreview.texts[0].scale = 1
         textPreview.texts[0].rotation = 0
         textPreview.texts[0].center = .zero
@@ -221,17 +239,24 @@ class TextInputController: UIViewController {
             .foregroundColor: UIColor.clear,
         ])
 
+        doneButton.isEnabled = !textView.text.isEmpty
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
     
     override func viewDidLoad() {
         view.addSubview(textPreview)
         view.addSubview(textView)
         view.addSubview(exitButton)
         view.addSubview(doneButton)
+        view.addSubview(slider)
+
+        slider.value = (textPreview.texts[0].font.pointSize - 8) / 40
+        print(textPreview.texts[0].font.pointSize)
+
 
         textPreview.isUserInteractionEnabled = false
 
@@ -259,7 +284,12 @@ class TextInputController: UIViewController {
 
             doneButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -12),
             doneButton.heightAnchor.constraint(equalToConstant: 42),
-            doneButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12)
+            doneButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
+
+            slider.leftAnchor.constraint(equalTo: view.leftAnchor),
+            slider.centerYAnchor.constraint(equalTo: textView.centerYAnchor, constant: 32),
+            slider.widthAnchor.constraint(equalToConstant: 16),
+            slider.heightAnchor.constraint(equalToConstant: 240)
         ])
 
         textView.becomeFirstResponder()
@@ -269,6 +299,7 @@ class TextInputController: UIViewController {
 extension TextInputController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
 
+        doneButton.isEnabled = !textView.text.isEmpty
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = textPreview.texts[0].alignment
 

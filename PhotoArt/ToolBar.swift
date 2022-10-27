@@ -36,10 +36,16 @@ class ToolBar: UIView {
     var state: ToolBarState = .draw {
         didSet {
             if oldValue == .text && state != .text {
+                NSLayoutConstraint.deactivate([textParamsConstraint])
+                NSLayoutConstraint.deactivate([drawParamsConstraint])
+                NSLayoutConstraint.activate([drawParamsConstraint])
+                paramsBar.layoutIfNeeded()
+
                 UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8) { [unowned self] in
                     textStyleButton.alpha = 0
                     textAlignmentButton.alpha = 0
                     tools.forEach { tool in tool.showTool() }
+                    toolsContainer.isUserInteractionEnabled = true
                 }
             }
 
@@ -79,10 +85,16 @@ class ToolBar: UIView {
                     tools[selectedTool].transform = CGAffineTransform(translationX: 0, y: -16)
                 }
             } else if state == .text && oldValue != state {
+                NSLayoutConstraint.deactivate([drawParamsConstraint])
+                NSLayoutConstraint.deactivate([textParamsConstraint])
+                NSLayoutConstraint.activate([textParamsConstraint])
+                paramsBar.layoutIfNeeded()
+
                 UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8) { [unowned self] in
                     tools.forEach{ tool in tool.hideTool() }
                     textStyleButton.alpha = 1
                     textAlignmentButton.alpha = 1
+                    toolsContainer.isUserInteractionEnabled = false
                 }
             }
         }
@@ -341,6 +353,9 @@ class ToolBar: UIView {
         }
     }
 
+    private var drawParamsConstraint: NSLayoutConstraint!
+    private var textParamsConstraint: NSLayoutConstraint!
+
     override func layoutSubviews() {
         super.layoutSubviews()
 
@@ -368,6 +383,9 @@ class ToolBar: UIView {
         textAlignmentButton.alpha = 0
 
         addSubview(switcher)
+
+        drawParamsConstraint = paramsBar.rightAnchor.constraint(equalTo: switcher.leftAnchor)
+        textParamsConstraint = paramsBar.rightAnchor.constraint(equalTo: rightAnchor)
 
         NSLayoutConstraint.activate([
             exitBtn.topAnchor.constraint(equalTo: topAnchor, constant: 56),
@@ -397,7 +415,7 @@ class ToolBar: UIView {
 
             paramsBar.leftAnchor.constraint(equalTo: leftAnchor),
             paramsBar.rightAnchor.constraint(equalTo: rightAnchor),
-            paramsBar.bottomAnchor.constraint(equalTo: backBtn.topAnchor, constant: -8),
+            drawParamsConstraint,
         ])
     }
 

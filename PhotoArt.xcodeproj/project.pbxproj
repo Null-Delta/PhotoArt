@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		860ABBF4290B09DF007E934D /* FontSizeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860ABBF3290B09DF007E934D /* FontSizeSlider.swift */; };
 		862947E9290872CD00391E55 /* EditMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947E8290872CD00391E55 /* EditMenu.swift */; };
 		862947EB29087C2D00391E55 /* TextStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947EA29087C2D00391E55 /* TextStyleButton.swift */; };
 		862947F12908800800391E55 /* TextAlignmentButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947F02908800800391E55 /* TextAlignmentButton.swift */; };
@@ -62,6 +63,7 @@
 		1F25F0C493D7197053E34138 /* Pods-PhotoArt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoArt.debug.xcconfig"; path = "Target Support Files/Pods-PhotoArt/Pods-PhotoArt.debug.xcconfig"; sourceTree = "<group>"; };
 		2BAD913032522E57EF9FE9E4 /* Pods-PhotoArt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoArt.release.xcconfig"; path = "Target Support Files/Pods-PhotoArt/Pods-PhotoArt.release.xcconfig"; sourceTree = "<group>"; };
 		34E52F59859C888902F45C0D /* Pods_PhotoArt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoArt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		860ABBF3290B09DF007E934D /* FontSizeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSizeSlider.swift; sourceTree = "<group>"; };
 		862947E8290872CD00391E55 /* EditMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMenu.swift; sourceTree = "<group>"; };
 		862947EA29087C2D00391E55 /* TextStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyleButton.swift; sourceTree = "<group>"; };
 		862947F02908800800391E55 /* TextAlignmentButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAlignmentButton.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 			children = (
 				86C40F5E29057358003C8573 /* TextView.swift */,
 				862947F22908924400391E55 /* TextInputController.swift */,
+				860ABBF3290B09DF007E934D /* FontSizeSlider.swift */,
 			);
 			name = TextEditor;
 			sourceTree = "<group>";
@@ -432,6 +435,7 @@
 				8668D72A28F8106100A2E72E /* DefaultTool.swift in Sources */,
 				8668D71E28F7592400A2E72E /* Tool.swift in Sources */,
 				8668D72C28F8117300A2E72E /* DefaultDrawTool.swift in Sources */,
+				860ABBF4290B09DF007E934D /* FontSizeSlider.swift in Sources */,
 				86B0784028FD85A200B4EB3F /* GalleryGrid.swift in Sources */,
 				8658A78A2901EB780070C893 /* BeizerShader.metal in Sources */,
 				8658A7882901E5100070C893 /* BeizerLine.swift in Sources */,

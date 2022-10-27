@@ -11,6 +11,7 @@ import PencilKit
 class EditorViewController: UIViewController {
 
     var image = UIImage(named: "testImage")!
+    var video: AVAsset?
 
     lazy private var navigationBar: EditorNavigationBar = {
         let bar = EditorNavigationBar(
@@ -66,6 +67,7 @@ class EditorViewController: UIViewController {
             canvas.undoManager!.registerUndo(withTarget: self, handler: { [unowned self] _ in
                 objectsLayer.texts[textIndex] = oldState
                 objectsLayer.selectedText = textIndex
+                bar.setText(text: objectsLayer.texts[objectsLayer.selectedText!])
 
                 objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
             })
@@ -81,13 +83,23 @@ class EditorViewController: UIViewController {
             inputController.onInputDone = { [unowned self] text in
                 var text = text
                 text.center = objectsLayer.center
+                text.scale = 1.0
+
+                startAngle = text.rotation
+                startCenter = text.center
+                startScale = text.scale
+
                 objectsLayer.texts.append(text)
                 objectsLayer.selectedText = objectsLayer.texts.count - 1
                 objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
 
+                bar.setText(text: objectsLayer.texts[objectsLayer.selectedText!])
+
                 canvas.undoManager!.registerUndo(withTarget: self, handler: { [unowned self] _ in
                     objectsLayer.texts.removeAll(where: { $0.id == text.id })
                     objectsLayer.selectedText = nil
+                    objectsLayer.state = .nothing
+                    bar.state = .draw
                     objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
                 })
 
@@ -95,7 +107,9 @@ class EditorViewController: UIViewController {
             }
 
             inputController.onInputCancel = { [unowned self] in
-                toolBar.state = .draw
+                UIView.performWithoutAnimation {
+                    toolBar.state = .draw
+                }
             }
 
             present(inputController, animated: true)
@@ -106,6 +120,18 @@ class EditorViewController: UIViewController {
 
     private var undoObservation: NSKeyValueObservation!
 
+    lazy private var videoPlayer: AVQueuePlayer = {
+        let player = AVQueuePlayer(playerItem: nil)
+        return player
+    }()
+
+    private var looper: AVPlayerLooper?
+
+    lazy private var playerLayer: AVPlayerLayer = {
+        let layer = AVPlayerLayer(player: videoPlayer)
+
+        return layer
+    }()
 
     lazy private var canvas: PKCanvasView = {
         let canvas = PKCanvasView(frame: .zero)
@@ -127,6 +153,7 @@ class EditorViewController: UIViewController {
 
         canvas.insertSubview(imageView, at: 0)
         canvas.insertSubview(objectsLayer, at: 1)
+
         return canvas
     }()
 
@@ -202,6 +229,7 @@ class EditorViewController: UIViewController {
                 canvas.undoManager!.registerUndo(withTarget: self, handler: { [unowned self] _ in
                     objectsLayer.texts[tapText] = oldState
                     objectsLayer.selectedText = tapText
+                    toolBar.setText(text: objectsLayer.texts[objectsLayer.selectedText!])
 
                     objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
                 })
@@ -210,13 +238,16 @@ class EditorViewController: UIViewController {
             present(inputController, animated: true)
         } else {
             objectsLayer.selectedText = tapText
+            startCenter = objectsLayer.texts[tapText].center
+            startAngle = objectsLayer.texts[tapText].rotation
+            startScale = objectsLayer.texts[tapText].scale
+
             objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
             toolBar.setText(text: objectsLayer.texts[tapText])
         }
     }
 
     @objc private func onGesture() {
-
         guard
             canvas.pinchGestureRecognizer?.state != .began,
             canvas.pinchGestureRecognizer?.state != .changed,
@@ -306,18 +337,22 @@ class EditorViewController: UIViewController {
             let actionScale = startScale
             let textIndex = objectsLayer.selectedText!
             let currentText = objectsLayer.texts[objectsLayer.selectedText!]
+            print(textIndex, actionCenter, actionAngle, actionScale)
 
             guard
-                actionCenter != currentText.center,
-                actionScale != currentText.scale,
+                actionCenter != currentText.center ||
+                actionScale != currentText.scale ||
                 actionAngle != currentText.rotation
             else { return }
 
-            canvas.undoManager!.registerUndo(withTarget: self, handler: { [unowned self] _ in
+            canvas.undoManager!.registerUndo(withTarget: self, handler: { [unowned self, actionCenter, actionAngle, actionScale, textIndex] _ in
+                print(textIndex, actionCenter, actionAngle, actionScale)
+
                 objectsLayer.selectedText = textIndex
                 objectsLayer.texts[textIndex].center = actionCenter
                 objectsLayer.texts[textIndex].rotation = actionAngle
                 objectsLayer.texts[textIndex].scale = actionScale
+                toolBar.setText(text: objectsLayer.texts[objectsLayer.selectedText!])
 
                 objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
             })
@@ -354,6 +389,10 @@ class EditorViewController: UIViewController {
         canvas.contentOffset.y = -(view.bounds.height - canvas.contentSize.height) / 2
 
         objectsLayer.drawTexts(size: objectsLayer.bounds.size)
+
+        playerLayer.frame = imageView.bounds
+
+        navigationBar.isUndoEnabled = false
     }
 
     override func viewDidLoad() {
@@ -389,6 +428,17 @@ class EditorViewController: UIViewController {
             toolBar.rightAnchor.constraint(equalTo: view.rightAnchor),
             toolBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -96)
         ])
+
+        if video != nil {
+            imageView.image = nil
+            videoPlayer = AVQueuePlayer(playerItem: AVPlayerItem(asset: video!))
+            playerLayer.player = videoPlayer
+
+            looper = AVPlayerLooper(player: videoPlayer, templateItem: videoPlayer.currentItem!)
+
+            videoPlayer.play()
+            canvas.layer.insertSublayer(playerLayer, at: 0)
+        }
     }
 }
 
@@ -423,6 +473,13 @@ extension EditorViewController: PKCanvasViewDelegate {
         objectsLayer.frame.size.height = imageView.bounds.height
         objectsLayer.frame.origin.y = (canvas.contentSize.height - imageView.frame.size.height) / 2
         objectsLayer.subviews[0].frame.size = objectsLayer.frame.size
+
+        if scrollView.isZooming {
+            playerLayer.frame = imageView.bounds
+            playerLayer.removeAllAnimations()
+        } else {
+            playerLayer.frame = imageView.bounds
+        }
     }
 
     func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
@@ -448,6 +505,7 @@ extension EditorViewController: UIGestureRecognizerDelegate {
 }
 
 import SwiftUI
+import AVFoundation
 struct ViewControllerProvider: PreviewProvider {
     static var previews: some View {
         ContainerView().edgesIgnoringSafeArea(.all)

@@ -93,7 +93,7 @@ class GalleryController: UIViewController {
         let options = PHFetchOptions()
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
 
-        self.assets = PHAsset.fetchAssets(with: .image, options: options)
+        self.assets = PHAsset.fetchAssets(with: options)
     }
 }
 
@@ -113,27 +113,78 @@ extension GalleryController: UICollectionViewDelegate {
             else { return }
             let size = CGSize(width: view.bounds.width * UIScreen.main.scale, height: view.bounds.height * UIScreen.main.scale)
 
-            DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
-                let requestOptions = PHImageRequestOptions()
-                requestOptions.isSynchronous = true
-                requestOptions.isNetworkAccessAllowed = true
+            cell.isLoading = true
 
-                manager.requestImage(
-                    for: assets.object(at: indexPath.item - layout.itemsOffset),
-                    targetSize: size,
-                    contentMode: .aspectFit,
-                    options: requestOptions
-                ) { [weak self] (image, _) -> Void in
-                    DispatchQueue.main.async {
-                        cell.image = image
-                        self!.heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: self!.view))
+            if assets.object(at: indexPath.item - layout.itemsOffset).mediaType == .image {
+                DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+                    let requestOptions = PHImageRequestOptions()
+                    requestOptions.isSynchronous = true
+                    requestOptions.isNetworkAccessAllowed = true
 
-                        let editor = EditorViewController()
-                        editor.image = image ?? UIImage(named: "testImage")!
-                        editor.modalPresentationStyle = .overFullScreen
-                        editor.transitioningDelegate = self!.heroTransition
+                    manager.requestImage(
+                        for: assets.object(at: indexPath.item - layout.itemsOffset),
+                        targetSize: size,
+                        contentMode: .aspectFit,
+                        options: requestOptions
+                    ) { [weak self] (image, data) -> Void in
+                        DispatchQueue.main.async {
+                            cell.image = image
+                            self!.heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: self!.view))
 
-                        self!.present(editor, animated: true)
+                            let editor = EditorViewController()
+                            editor.image = image ?? UIImage(named: "testImage")!
+                            editor.modalPresentationStyle = .overFullScreen
+                            editor.transitioningDelegate = self!.heroTransition
+
+                            cell.isLoading = false
+
+                            self!.present(editor, animated: true)
+                        }
+                    }
+                }
+            } else {
+                cell.isLoading = true
+
+                DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+                    let requestVideoOptions = PHVideoRequestOptions()
+                    requestVideoOptions.deliveryMode = .mediumQualityFormat
+                    requestVideoOptions.isNetworkAccessAllowed = true
+
+                    let requestOptions = PHImageRequestOptions()
+                    requestOptions.isSynchronous = true
+                    requestOptions.isNetworkAccessAllowed = true
+
+                    manager.requestImage(
+                        for: assets.object(at: indexPath.item - layout.itemsOffset),
+                        targetSize: size,
+                        contentMode: .aspectFit,
+                        options: requestOptions
+                    ) { [unowned self] (image, data) -> Void in
+
+                        guard image != nil else { return }
+
+                        manager.requestAVAsset(
+                            forVideo: assets.object(at: indexPath.item - layout.itemsOffset),
+                            options: requestVideoOptions,
+                            resultHandler: { video, _, _ in
+                                guard video != nil else { return }
+
+                                DispatchQueue.main.async { [unowned self] in
+                                    heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: view))
+                                    cell.image = image
+
+                                    let editor = EditorViewController()
+                                    editor.video = video
+                                    editor.image = image!
+                                    editor.modalPresentationStyle = .overFullScreen
+                                    editor.transitioningDelegate = heroTransition
+
+                                    cell.isLoading = false
+
+                                    present(editor, animated: true)
+                                }
+                            }
+                        )
                     }
                 }
             }
@@ -214,9 +265,16 @@ extension GalleryController: UICollectionViewDataSource {
                 return cell
             }
 
+
+            if assets.object(at: indexPath.item - layout.itemsOffset).mediaType == .image {
+                cell.time = nil
+            } else {
+                cell.time = toTime(time: assets.object(at: indexPath.item - layout.itemsOffset).duration)
+            }
+
             DispatchQueue.global(qos: .default).async {[unowned self] in
                 let options = PHImageRequestOptions()
-                options.isSynchronous = false
+                options.isSynchronous = true
                 options.isNetworkAccessAllowed = true
 
                 manager.requestImage(
@@ -232,5 +290,9 @@ extension GalleryController: UICollectionViewDataSource {
             }
             return cell
         }
+    }
+
+    private func toTime(time: TimeInterval) -> String {
+        return "\(Int(time / 60)):\(Int(time)%60)"
     }
 }
