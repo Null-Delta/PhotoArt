@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		860ABBF4290B09DF007E934D /* FontSizeSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860ABBF3290B09DF007E934D /* FontSizeSlider.swift */; };
+		860ABBF6290B142F007E934D /* ColorPickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860ABBF5290B142F007E934D /* ColorPickerController.swift */; };
+		860ABBF8290B15C9007E934D /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860ABBF7290B15C9007E934D /* UIView+Extensions.swift */; };
+		860ABBFA290B19FF007E934D /* ColorSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860ABBF9290B19FF007E934D /* ColorSlider.swift */; };
 		862947E9290872CD00391E55 /* EditMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947E8290872CD00391E55 /* EditMenu.swift */; };
 		862947EB29087C2D00391E55 /* TextStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947EA29087C2D00391E55 /* TextStyleButton.swift */; };
 		862947F12908800800391E55 /* TextAlignmentButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947F02908800800391E55 /* TextAlignmentButton.swift */; };
@@ -64,6 +67,9 @@
 		2BAD913032522E57EF9FE9E4 /* Pods-PhotoArt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotoArt.release.xcconfig"; path = "Target Support Files/Pods-PhotoArt/Pods-PhotoArt.release.xcconfig"; sourceTree = "<group>"; };
 		34E52F59859C888902F45C0D /* Pods_PhotoArt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotoArt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		860ABBF3290B09DF007E934D /* FontSizeSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSizeSlider.swift; sourceTree = "<group>"; };
+		860ABBF5290B142F007E934D /* ColorPickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerController.swift; sourceTree = "<group>"; };
+		860ABBF7290B15C9007E934D /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
+		860ABBF9290B19FF007E934D /* ColorSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSlider.swift; sourceTree = "<group>"; };
 		862947E8290872CD00391E55 /* EditMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMenu.swift; sourceTree = "<group>"; };
 		862947EA29087C2D00391E55 /* TextStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyleButton.swift; sourceTree = "<group>"; };
 		862947F02908800800391E55 /* TextAlignmentButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAlignmentButton.swift; sourceTree = "<group>"; };
@@ -128,6 +134,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		860ABBFB290B1B3D007E934D /* ColorPicker */ = {
+			isa = PBXGroup;
+			children = (
+				860ABBF5290B142F007E934D /* ColorPickerController.swift */,
+				860ABBF9290B19FF007E934D /* ColorSlider.swift */,
+			);
+			name = ColorPicker;
+			sourceTree = "<group>";
+		};
 		863793BD28F978DE00C64A82 /* Access Animations */ = {
 			isa = PBXGroup;
 			children = (
@@ -210,6 +225,7 @@
 		8699625428F3612A00F3850F /* Editor */ = {
 			isa = PBXGroup;
 			children = (
+				860ABBFB290B1B3D007E934D /* ColorPicker */,
 				86C40F5D29057343003C8573 /* TextEditor */,
 				8658A7862901E5020070C893 /* Actions */,
 				8699626428F4187F00F3850F /* ToolBar */,
@@ -231,6 +247,7 @@
 				86EA1A3428FB2BA4006819F5 /* Interpolation.swift */,
 				86EA1A3828FC51C0006819F5 /* CGSize+Extensions.swift */,
 				86B0783828FC652800B4EB3F /* CGRect+Extensions.swift */,
+				860ABBF7290B15C9007E934D /* UIView+Extensions.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -430,6 +447,7 @@
 				86A4817228F899D900207D58 /* GalleryCell.swift in Sources */,
 				86EA1A3928FC51C0006819F5 /* CGSize+Extensions.swift in Sources */,
 				862947F12908800800391E55 /* TextAlignmentButton.swift in Sources */,
+				860ABBF6290B142F007E934D /* ColorPickerController.swift in Sources */,
 				86A4817E28F9588B00207D58 /* UIVisualEffect+Extensions.swift in Sources */,
 				8699623F28F3602900F3850F /* AppDelegate.swift in Sources */,
 				8668D72A28F8106100A2E72E /* DefaultTool.swift in Sources */,
@@ -443,6 +461,7 @@
 				86A4817C28F951F200207D58 /* GalleryLayout.swift in Sources */,
 				8668D72828F77B0F00A2E72E /* EraseTool.swift in Sources */,
 				86EA1A3728FB4254006819F5 /* CollectionTransitionController.swift in Sources */,
+				860ABBF8290B15C9007E934D /* UIView+Extensions.swift in Sources */,
 				862947EB29087C2D00391E55 /* TextStyleButton.swift in Sources */,
 				863793BF28F978F200C64A82 /* AccessTransitioningDelegate.swift in Sources */,
 				862947F32908924400391E55 /* TextInputController.swift in Sources */,
@@ -457,6 +476,7 @@
 				862947E9290872CD00391E55 /* EditMenu.swift in Sources */,
 				8668D72428F7722E00A2E72E /* BrushTool.swift in Sources */,
 				86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */,
+				860ABBFA290B19FF007E934D /* ColorSlider.swift in Sources */,
 				8693FBDB2901696800A3CE21 /* MultiGalleryLayout.swift in Sources */,
 				86B0783B28FC7E9A00B4EB3F /* ValueAnimator.swift in Sources */,
 				863793BC28F9776800C64A82 /* AccessController.swift in Sources */,

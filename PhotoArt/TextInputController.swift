@@ -165,8 +165,10 @@ class TextInputController: UIViewController {
         textView.selectedRange = NSRange(location: 0, length: 0)
 
         while currentPosition != textView.text.count {
+            print(currentPosition)
+
             if textView.text[textView.text.index(textView.text.startIndex, offsetBy: currentPosition)] == "\n" {
-                currentPosition += 1
+                //currentPosition += 1
                 textView.selectedRange = NSRange(location: currentPosition, length: 0)
             }
 
@@ -174,7 +176,11 @@ class TextInputController: UIViewController {
             let endOfLine =
             textView.tokenizer.position(from: currentPositionLabel, toBoundary: .line, inDirection: .storage(.forward))!
 
-            let intEnd = textView.offset(from: textView.beginningOfDocument, to: endOfLine)
+            var intEnd = max(currentPosition + 1, textView.offset(from: textView.beginningOfDocument, to: endOfLine))
+
+            if intEnd > textView.text.count {
+                intEnd = textView.text.count
+            }
 
             result.append(String(textView.text[textView.text.index(textView.text.startIndex, offsetBy: currentPosition)..<textView.text.index(textView.text.startIndex, offsetBy: intEnd)]))
 
@@ -182,9 +188,32 @@ class TextInputController: UIViewController {
             textView.selectedRange = NSRange(location: currentPosition, length: 0)
         }
 
-
         textView.selectedRange = currentRange
-        print(result.count)
+
+        print(result)
+        result = result.map({ $0 == "" ? " " : $0 })
+
+        var i = 0
+        var wasN = false
+        while(i < result.count) {
+            if result[i] == "\n" && i == result.count - 1 {
+                result[i] = " "
+                if wasN {
+                    result.append(" ")
+                }
+            } else if result[i] == "\n" && !wasN {
+                result.remove(at: i)
+                i -= 1
+                wasN = true
+            } else if result[i] == "\n" && wasN {
+                result[i] = " "
+            } else if result[i] != "\n" && wasN {
+                wasN = false
+            }
+            i += 1
+        }
+
+        print(result)
         return result
     }
 
@@ -201,6 +230,16 @@ class TextInputController: UIViewController {
     override func viewDidLayoutSubviews() {
         textPreview.subviews[0].frame = view.bounds
         textPreview.drawTexts(size: view.bounds.size)
+    }
+
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        UIView.performWithoutAnimation {
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
+        }
     }
 
     private var centerTextViewConstraint: NSLayoutConstraint!

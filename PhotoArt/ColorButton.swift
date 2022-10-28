@@ -89,6 +89,12 @@ class ColorButton: UIView {
         return gesture
     }()
 
+    lazy private var tapGesture: UITapGestureRecognizer = {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(onTap))
+
+        return gesture
+    }()
+
     lazy private var gradientPickerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -344,6 +350,14 @@ class ColorButton: UIView {
 
         gradientLayer.frame = bounds
     }
+
+    @objc private func onTap() {
+        let controller = ColorPickerController()
+        controller.modalPresentationStyle = .overFullScreen
+
+        self.parentViewController!.present(controller, animated: true)
+    }
+
     init(onColorCanged: @escaping (UIColor) -> Void) {
         self.onColorCanged = onColorCanged
         super.init(frame: .zero)
@@ -353,6 +367,7 @@ class ColorButton: UIView {
         addSubview(gradientView)
 
         addGestureRecognizer(longPressGesture)
+        addGestureRecognizer(tapGesture)
 
         NSLayoutConstraint.activate([
             colorView.centerXAnchor.constraint(equalTo: centerXAnchor),
