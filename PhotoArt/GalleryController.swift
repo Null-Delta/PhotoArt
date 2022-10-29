@@ -7,14 +7,33 @@
 
 import UIKit
 import Photos
+import PencilKit
+
+class OverridedAsset {
+    var preview: UIImage
+    var sourcePreview: UIImage
+    var source: Any
+    var texts: [Text]
+    var drawing: PKDrawing
+
+    init(preview: UIImage, sourcePreview: UIImage, source: Any, texts: [Text], drawing: PKDrawing) {
+        self.preview = preview
+        self.sourcePreview = sourcePreview
+        self.source = source
+        self.texts = texts
+        self.drawing = drawing
+    }
+}
 
 class GalleryController: UIViewController {
 
     private var heroTransition: HeroTransitioningDelegate?
-    private var accessTransitionDelegate = AccessTransitioningDelegate()
 
     private var assets: PHFetchResult<PHAsset>!
     private var manager: PHCachingImageManager = PHCachingImageManager()
+
+    private var overridedAssets: [Int: OverridedAsset] = [:]
+    private var cachesMiniatures: [Int: UIImage] = [:]
 
     lazy private var collection: GalleryGrid = {
         let collection = GalleryGrid(delegate: self, dataSource: self)
@@ -57,17 +76,12 @@ class GalleryController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        let accessController = AccessController()
-        accessController.modalPresentationStyle = .overFullScreen
-        accessController.transitioningDelegate = accessTransitionDelegate
-
-        present(accessController, animated: false)
     }
 
     override func viewDidLoad() {
         view.addSubview(collection)
         view.addSubview(blurView)
+        view.backgroundColor = .black
 
         NSLayoutConstraint.activate([
             collection.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -104,87 +118,116 @@ extension GalleryController: UICollectionViewDelegate {
             indexPath.item - layout.itemsOffset >= 0
         else { return }
 
-
         if layout is MultiGalleryLayout {
-            collection.animateZoom(atIndex: indexPath.item * layout.countOfColumns + 1)
+            //collection.animateZoom(atIndex: indexPath.item * layout.countOfColumns + 1)
         } else {
             guard
                 let cell = collectionView.cellForItem(at: indexPath) as? GalleryCell
             else { return }
             let size = CGSize(width: view.bounds.width * UIScreen.main.scale, height: view.bounds.height * UIScreen.main.scale)
 
-            cell.isLoading = true
+            if overridedAssets[indexPath.item - layout.itemsOffset] != nil {
+                cell.image = overridedAssets[indexPath.item - layout.itemsOffset]?.preview
+                heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: view))
 
-            if assets.object(at: indexPath.item - layout.itemsOffset).mediaType == .image {
-                DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
-                    let requestOptions = PHImageRequestOptions()
-                    requestOptions.isSynchronous = true
-                    requestOptions.isNetworkAccessAllowed = true
-
-                    manager.requestImage(
-                        for: assets.object(at: indexPath.item - layout.itemsOffset),
-                        targetSize: size,
-                        contentMode: .aspectFit,
-                        options: requestOptions
-                    ) { [weak self] (image, data) -> Void in
-                        DispatchQueue.main.async {
-                            cell.image = image
-                            self!.heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: self!.view))
-
-                            let editor = EditorViewController()
-                            editor.image = image ?? UIImage(named: "testImage")!
-                            editor.modalPresentationStyle = .overFullScreen
-                            editor.transitioningDelegate = self!.heroTransition
-
-                            cell.isLoading = false
-
-                            self!.present(editor, animated: true)
-                        }
-                    }
+                let editor = EditorViewController()
+                editor.overridedAsset = overridedAssets[indexPath.item - layout.itemsOffset]
+                editor.image = cell.image ?? UIImage(named: "testImage")!
+                editor.video = overridedAssets[indexPath.item - layout.itemsOffset]?.source as? AVAsset
+                editor.modalPresentationStyle = .overFullScreen
+                editor.transitioningDelegate = heroTransition
+                editor.onEdit = { [unowned self] newAsset in
+                    overridedAssets[indexPath.item - layout.itemsOffset] = newAsset
+                    collection.reloadItem(at: indexPath.item)
+                    cell.image = newAsset.preview
                 }
+                cell.isLoading = false
+
+                present(editor, animated: true)
+
             } else {
                 cell.isLoading = true
 
-                DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
-                    let requestVideoOptions = PHVideoRequestOptions()
-                    requestVideoOptions.deliveryMode = .mediumQualityFormat
-                    requestVideoOptions.isNetworkAccessAllowed = true
+                if assets.object(at: indexPath.item - layout.itemsOffset).mediaType == .image {
+                    DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+                        let requestOptions = PHImageRequestOptions()
+                        requestOptions.isSynchronous = true
+                        requestOptions.isNetworkAccessAllowed = true
 
-                    let requestOptions = PHImageRequestOptions()
-                    requestOptions.isSynchronous = true
-                    requestOptions.isNetworkAccessAllowed = true
+                        manager.requestImage(
+                            for: assets.object(at: indexPath.item - layout.itemsOffset),
+                            targetSize: size,
+                            contentMode: .aspectFit,
+                            options: requestOptions
+                        ) { [unowned self] (image, data) -> Void in
+                            DispatchQueue.main.async { [unowned self] in
+                                cell.image = image
+                                heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: view))
 
-                    manager.requestImage(
-                        for: assets.object(at: indexPath.item - layout.itemsOffset),
-                        targetSize: size,
-                        contentMode: .aspectFit,
-                        options: requestOptions
-                    ) { [unowned self] (image, data) -> Void in
-
-                        guard image != nil else { return }
-
-                        manager.requestAVAsset(
-                            forVideo: assets.object(at: indexPath.item - layout.itemsOffset),
-                            options: requestVideoOptions,
-                            resultHandler: { video, _, _ in
-                                guard video != nil else { return }
-
-                                DispatchQueue.main.async { [unowned self] in
-                                    heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: view))
-                                    cell.image = image
-
-                                    let editor = EditorViewController()
-                                    editor.video = video
-                                    editor.image = image!
-                                    editor.modalPresentationStyle = .overFullScreen
-                                    editor.transitioningDelegate = heroTransition
-
-                                    cell.isLoading = false
-
-                                    present(editor, animated: true)
+                                let editor = EditorViewController()
+                                editor.image = image ?? UIImage(named: "testImage")!
+                                editor.modalPresentationStyle = .overFullScreen
+                                editor.transitioningDelegate = heroTransition
+                                editor.onEdit = { [unowned self] newAsset in
+                                    overridedAssets[indexPath.item - layout.itemsOffset] = newAsset
+                                    collection.reloadItem(at: indexPath.item)
+                                    cell.image = newAsset.preview
                                 }
+
+                                cell.isLoading = false
+
+                                present(editor, animated: true)
                             }
-                        )
+                        }
+                    }
+                } else {
+                    cell.isLoading = true
+
+                    DispatchQueue.global(qos: .userInteractive).async { [unowned self] in
+                        let requestVideoOptions = PHVideoRequestOptions()
+                        requestVideoOptions.deliveryMode = .mediumQualityFormat
+                        requestVideoOptions.isNetworkAccessAllowed = true
+
+                        let requestOptions = PHImageRequestOptions()
+                        requestOptions.isSynchronous = true
+                        requestOptions.isNetworkAccessAllowed = true
+
+                        manager.requestImage(
+                            for: assets.object(at: indexPath.item - layout.itemsOffset),
+                            targetSize: size,
+                            contentMode: .aspectFit,
+                            options: requestOptions
+                        ) { [unowned self] (image, data) -> Void in
+
+                            guard image != nil else { return }
+
+                            manager.requestAVAsset(
+                                forVideo: assets.object(at: indexPath.item - layout.itemsOffset),
+                                options: requestVideoOptions,
+                                resultHandler: { video, _, _ in
+                                    guard video != nil else { return }
+
+                                    DispatchQueue.main.async { [unowned self] in
+                                        heroTransition = HeroTransitioningDelegate(fromView: cell.contentView.subviews[1] as! UIImageView, fromViewFrame: cell.convert(cell.bounds, to: view))
+                                        cell.image = image
+
+                                        let editor = EditorViewController()
+                                        editor.video = video
+                                        editor.image = image!
+                                        editor.modalPresentationStyle = .overFullScreen
+                                        editor.transitioningDelegate = heroTransition
+                                        editor.onEdit = { [unowned self] newAsset in
+                                            overridedAssets[indexPath.item - layout.itemsOffset] = newAsset
+                                            collection.reloadItem(at: indexPath.item)
+                                            cell.image = newAsset.preview
+                                        }
+                                        cell.isLoading = false
+
+                                        present(editor, animated: true)
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -217,7 +260,7 @@ extension GalleryController: UICollectionViewDataSource {
         var imageSize: CGSize = CGSize(width: layout.cellSize, height: layout.cellSize)
 
         if layout is MultiGalleryLayout {
-            imageSize = CGSize(width: 8, height: 8)
+            imageSize = CGSize(width: 1, height: 1)
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "multi_photo", for: indexPath) as! MultiGalleryCell
             cell.clearImages()
             
@@ -232,20 +275,28 @@ extension GalleryController: UICollectionViewDataSource {
                     continue
                 }
 
-                DispatchQueue.global(qos: .userInitiated).async {[unowned self] in
-                    let options = PHImageRequestOptions()
-                    options.isSynchronous = false
-                    options.isNetworkAccessAllowed = false
-                    options.deliveryMode = .fastFormat
+                if overridedAssets[globalIndex] != nil {
+                    cell.updateImage(at: assetIndex, image: overridedAssets[globalIndex]?.preview)
+                } else if cachesMiniatures[globalIndex] != nil {
+                    cell.updateImage(at: assetIndex, image: cachesMiniatures[globalIndex])
+                } else {
+                    DispatchQueue.global(qos: .userInitiated).async {[unowned self] in
+                        let options = PHImageRequestOptions()
+                        options.isSynchronous = true
+                        options.isNetworkAccessAllowed = false
+                        options.deliveryMode = .fastFormat
+                        options.resizeMode = .exact
 
-                    manager.requestImage(
-                        for: assets.object(at: globalIndex),
-                        targetSize: imageSize,
-                        contentMode: .aspectFill,
-                        options: options
-                    ) { (image, _) -> Void in
-                        DispatchQueue.main.async {
-                            cell.updateImage(at: assetIndex, image: image)
+                        manager.requestImage(
+                            for: assets.object(at: globalIndex),
+                            targetSize: imageSize,
+                            contentMode: .aspectFill,
+                            options: options
+                        ) { (image, _) -> Void in
+                            DispatchQueue.main.async { [unowned self] in
+                                cachesMiniatures[globalIndex] = image
+                                cell.updateImage(at: assetIndex, image: image)
+                            }
                         }
                     }
                 }
@@ -265,29 +316,33 @@ extension GalleryController: UICollectionViewDataSource {
                 return cell
             }
 
-
-            if assets.object(at: indexPath.item - layout.itemsOffset).mediaType == .image {
-                cell.time = nil
+            if overridedAssets[indexPath.item - layout.itemsOffset] != nil {
+                cell.image = overridedAssets[indexPath.item - layout.itemsOffset]?.preview
             } else {
-                cell.time = toTime(time: assets.object(at: indexPath.item - layout.itemsOffset).duration)
-            }
+                if assets.object(at: indexPath.item - layout.itemsOffset).mediaType == .image {
+                    cell.time = nil
+                } else {
+                    cell.time = toTime(time: assets.object(at: indexPath.item - layout.itemsOffset).duration)
+                }
 
-            DispatchQueue.global(qos: .default).async {[unowned self] in
-                let options = PHImageRequestOptions()
-                options.isSynchronous = true
-                options.isNetworkAccessAllowed = true
+                DispatchQueue.global(qos: .default).async {[unowned self] in
+                    let options = PHImageRequestOptions()
+                    options.isSynchronous = true
+                    options.isNetworkAccessAllowed = true
 
-                manager.requestImage(
-                    for: assets.object(at: indexPath.item - layout.itemsOffset),
-                    targetSize: imageSize,
-                    contentMode: .aspectFill,
-                    options: options
-                ) { (image, _) -> Void in
-                    DispatchQueue.main.async {
-                        cell.image = image
+                    manager.requestImage(
+                        for: assets.object(at: indexPath.item - layout.itemsOffset),
+                        targetSize: imageSize,
+                        contentMode: .aspectFill,
+                        options: options
+                    ) { (image, _) -> Void in
+                        DispatchQueue.main.async {
+                            cell.image = image
+                        }
                     }
                 }
             }
+
             return cell
         }
     }

@@ -28,13 +28,13 @@ class HeroDisappearAnimation: NSObject, UIViewControllerAnimatedTransitioning {
             let controller = transitionContext.viewController(forKey: .from) as? EditorViewController
         else { return }
 
+        print("AAA")
         let canvas = controller.view.subviews[0] as! UIScrollView
         let offset = canvas.contentOffset
         print(offset)
 
         let resultWidth = canvas.zoomScale * controller.view.bounds.width
         let resultHeight = resultWidth * (fromImage.image!.size.height / fromImage.image!.size.width)
-
 
         fromImage.alpha = 0
         let animationImage = UIImageView()
@@ -46,9 +46,8 @@ class HeroDisappearAnimation: NSObject, UIViewControllerAnimatedTransitioning {
             width: resultWidth,
             height: resultHeight
         )
-        animationImage.image = fromImage.image
 
-        
+        animationImage.image = controller.overridedAsset?.preview        
 
         transitionContext.containerView.addSubview(resultView)
         transitionContext.containerView.addSubview(animationImage)

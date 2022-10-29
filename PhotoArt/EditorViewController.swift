@@ -13,6 +13,10 @@ class EditorViewController: UIViewController {
     var image = UIImage(named: "testImage")!
     var video: AVAsset?
 
+    var overridedAsset: OverridedAsset?
+
+    var onEdit: (OverridedAsset) -> Void = { _ in }
+
     lazy private var navigationBar: EditorNavigationBar = {
         let bar = EditorNavigationBar(
             onZoomOut: { [unowned self] in
@@ -48,8 +52,33 @@ class EditorViewController: UIViewController {
         let bar = ToolBar()
         bar.translatesAutoresizingMaskIntoConstraints = false
 
-        bar.onEditorExit = { [weak self] in
-            self?.dismiss(animated: true)
+        bar.onEditorExit = { [unowned self] in
+            objectsLayer.selectedText = nil
+            objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+
+            var drawImage: UIImage = UIImage()
+
+            let currentTraits = UITraitCollection.current
+            UITraitCollection.current = UITraitCollection(userInterfaceStyle: .light)
+
+            drawImage = canvas.drawing.image(from: CGRect(origin: .zero, size: objectsLayer.bounds.size / canvas.zoomScale), scale: UIScreen.main.scale)
+
+            UITraitCollection.current = currentTraits
+
+            print(canvas.bounds.size, drawImage.size, image.size)
+            let overrideAsset = OverridedAsset(
+                preview: UIImage.merge(images: [overridedAsset?.sourcePreview ?? image, objectsLayer.result, drawImage]),
+                sourcePreview: image,
+                source: overridedAsset?.source ?? video ?? image,
+                texts: objectsLayer.texts,
+                drawing: canvas.drawing
+            )
+
+            image = overrideAsset.preview
+            overridedAsset = overrideAsset
+            onEdit(overrideAsset)
+
+            dismiss(animated: true)
         }
 
         bar.onTextStyleChange = { [unowned self] style, alignment, color in
@@ -118,8 +147,6 @@ class EditorViewController: UIViewController {
         return bar
     }()
 
-    private var undoObservation: NSKeyValueObservation!
-
     lazy private var videoPlayer: AVQueuePlayer = {
         let player = AVQueuePlayer(playerItem: nil)
         return player
@@ -164,17 +191,6 @@ class EditorViewController: UIViewController {
         return imageView
     }()
 
-    lazy private var workspace: Canvas = {
-        let canvas = Canvas(frame: .zero, device: MetalContext.device)
-        canvas.isOpaque = true
-        canvas.backgroundColor = .clear
-        canvas.gestureRecognizers?.forEach {
-            $0.delegate = self
-        }
-
-        return canvas
-    }()
-
     lazy private var objectsLayer: TextView = {
         let canvas = TextView(text: "")
         canvas.backgroundColor = .clear
@@ -203,6 +219,77 @@ class EditorViewController: UIViewController {
         return sqrt(pow(point.x, 2) + pow(point.y, 2))
     }
 
+    @objc private func onTextDuplicate() {
+        wasSecondTap = false
+    }
+
+    @objc private func onTextBrindToFront() {
+        let oldIndex = objectsLayer.selectedText!
+        objectsLayer.texts.insert(objectsLayer.texts.remove(at: oldIndex), at: objectsLayer.texts.count)
+        objectsLayer.selectedText = objectsLayer.texts.count - 1
+        objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+
+        canvas.undoManager?.registerUndo(withTarget: self, handler: { [unowned self] _ in
+            objectsLayer.texts.insert(objectsLayer.texts.remove(at: objectsLayer.texts.count - 1), at: oldIndex)
+            objectsLayer.selectedText = oldIndex
+            objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+        })
+
+        wasSecondTap = false
+    }
+
+    @objc private func onTextDelete() {
+        let oldText = objectsLayer.texts[objectsLayer.selectedText!]
+        let oldSelection = objectsLayer.selectedText!
+
+        objectsLayer.texts.remove(at: objectsLayer.selectedText!)
+        objectsLayer.selectedText = nil
+        objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+        objectsLayer.state = .nothing
+
+        canvas.undoManager?.registerUndo(withTarget: self, handler: { [unowned self] _ in
+            objectsLayer.texts.insert(oldText, at: oldSelection)
+            objectsLayer.selectedText = oldSelection
+            objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+        })
+
+        wasSecondTap = false
+    }
+
+    @objc private func onTextEdit() {
+        wasSecondTap = false
+
+        let tapText = objectsLayer.selectedText!
+
+        let inputController = TextInputController(text: objectsLayer.texts[tapText])
+        inputController.modalPresentationStyle = .overCurrentContext
+        inputController.modalTransitionStyle = .crossDissolve
+
+        inputController.onInputDone = { [unowned self] text in
+
+            let oldState = objectsLayer.texts[tapText]
+
+            objectsLayer.texts[tapText].text = text.text
+            objectsLayer.texts[tapText].style = text.style
+            objectsLayer.texts[tapText].alignment = text.alignment
+            objectsLayer.texts[tapText].font = text.font
+            objectsLayer.texts[tapText].color = text.color
+
+            objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+
+            canvas.undoManager!.registerUndo(withTarget: self, handler: { [unowned self] _ in
+                objectsLayer.texts[tapText] = oldState
+                objectsLayer.selectedText = tapText
+                toolBar.setText(text: objectsLayer.texts[objectsLayer.selectedText!])
+
+                objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+            })
+        }
+
+        present(inputController, animated: true)
+    }
+
+    private var wasSecondTap = false
 
     @objc private func onTap() {
         guard
@@ -210,33 +297,22 @@ class EditorViewController: UIViewController {
         else { return }
 
         if objectsLayer.selectedText == tapText {
-            let inputController = TextInputController(text: objectsLayer.texts[tapText])
-            inputController.modalPresentationStyle = .overCurrentContext
-            inputController.modalTransitionStyle = .crossDissolve
+            if !wasSecondTap {
+                wasSecondTap = true
+                UIMenuController.shared.menuItems = [
+                    UIMenuItem(title: "Edit", action: #selector(onTextEdit)),
+                    UIMenuItem(title: "Move Forvard", action: #selector(onTextBrindToFront)),
+                    UIMenuItem(title: "Delete", action: #selector(onTextDelete)),
+                    UIMenuItem(title: "Duplicate", action: #selector(onTextDuplicate)),
+                ]
 
-            inputController.onInputDone = { [unowned self] text in
-
-                let oldState = objectsLayer.texts[tapText]
-
-                objectsLayer.texts[tapText].text = text.text
-                objectsLayer.texts[tapText].style = text.style
-                objectsLayer.texts[tapText].alignment = text.alignment
-                objectsLayer.texts[tapText].font = text.font
-                objectsLayer.texts[tapText].color = text.color
-
-                objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
-
-                canvas.undoManager!.registerUndo(withTarget: self, handler: { [unowned self] _ in
-                    objectsLayer.texts[tapText] = oldState
-                    objectsLayer.selectedText = tapText
-                    toolBar.setText(text: objectsLayer.texts[objectsLayer.selectedText!])
-
-                    objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
-                })
+                UIMenuController.shared.showMenu(from: objectsLayer, rect: CGRect(origin: textTapGesture.location(in: objectsLayer), size: CGSize(width: 1, height: 1)))
+            } else {
+                onTextEdit()
             }
-
-            present(inputController, animated: true)
         } else {
+            wasSecondTap = false
+
             objectsLayer.selectedText = tapText
             startCenter = objectsLayer.texts[tapText].center
             startAngle = objectsLayer.texts[tapText].rotation
@@ -438,6 +514,17 @@ class EditorViewController: UIViewController {
 
             videoPlayer.play()
             canvas.layer.insertSublayer(playerLayer, at: 0)
+        }
+
+        guard let overridedAsset = overridedAsset else { return }
+        canvas.drawing = overridedAsset.drawing
+        objectsLayer.texts = overridedAsset.texts
+
+        if video == nil {
+            image = overridedAsset.source as! UIImage
+            imageView.image = overridedAsset.source as? UIImage
+        } else {
+            video = overridedAsset.source as? AVAsset
         }
     }
 }

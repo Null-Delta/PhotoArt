@@ -354,6 +354,11 @@ class ColorButton: UIView {
     @objc private func onTap() {
         let controller = ColorPickerController()
         controller.modalPresentationStyle = .overFullScreen
+        controller.onFinish = { color in
+            self.color = color
+            self.onColorCanged(color)
+        }
+        controller.setColor(color: self.color)
 
         self.parentViewController!.present(controller, animated: true)
     }

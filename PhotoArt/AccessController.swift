@@ -7,8 +7,12 @@
 
 import UIKit
 import Lottie
+import Photos
 
 class AccessController: UIViewController {
+
+    private var transitionDelegate = AccessTransitioningDelegate()
+
     lazy private var accessButton: UIButton = {
         let btn = UIButton()
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -128,8 +132,51 @@ class AccessController: UIViewController {
         return gradient
     }()
 
+    private func presentGallery() {
+        DispatchQueue.main.async { [unowned self] in
+            let gallery = GalleryController()
+            gallery.transitioningDelegate = transitionDelegate
+            gallery.modalPresentationStyle = .custom
+
+            present(gallery, animated: true)
+        }
+    }
+
     @objc private func onAccessAllowed() {
-        dismiss(animated: true)
+
+        let status = PHPhotoLibrary.authorizationStatus()
+
+        if status == .notDetermined {
+            PHPhotoLibrary.requestAuthorization { [unowned self] status in
+                if status == .authorized {
+                    presentGallery()
+                } else {
+                    DispatchQueue.main.async { [unowned self] in
+                        let alert = UIAlertController(title: nil, message: "The app needs access to photos", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "Open settings", style: .default, handler: { _ in
+                            if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                            }
+                        }))
+
+                        present(alert, animated: true)
+                    }
+                }
+            }
+        } else if status == .authorized {
+            presentGallery()
+        } else {
+            DispatchQueue.main.async { [unowned self] in
+                let alert = UIAlertController(title: nil, message: "The app needs access to photos", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Open settings", style: .default, handler: { _ in
+                    if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                    }
+                }))
+
+                present(alert, animated: true)
+            }
+        }
     }
 
     override func viewDidLayoutSubviews() {

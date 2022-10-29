@@ -60,7 +60,7 @@ class GalleryLayout: UICollectionViewLayout {
         var visibleAttributes: [UICollectionViewLayoutAttributes] = []
 
         let firstItem = max(0, Int(floor(rect.minY / cellSize)) * countOfColumns)
-        let lastItem = min(Int(floor(rect.maxY / cellSize)) * countOfColumns + countOfColumns, countOfItems - 1)
+        let lastItem = max(0, min(Int(floor(rect.maxY / cellSize)) * countOfColumns + countOfColumns, countOfItems - 1))
 
         for index in firstItem..<lastItem {
             visibleAttributes.append(attributes[index])

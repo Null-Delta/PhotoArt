@@ -85,6 +85,13 @@ class TextView: UIView {
 
         setup(with: texts[selectedText])
 
+        let length = sqrt(pow(point.x - text.center.x, 2) + pow(point.y - text.center.y, 2))
+
+        let newPoint = text.center + CGPoint(
+            x: length * (cos(-text.rotation) - sin(-text.rotation)),
+            y: length * (cos(-text.rotation) + sin(-text.rotation))
+        )
+
         let rect = CGRect(
             x: -(textWidth * text.scale / 2) - 12 + text.center.x,
             y: -(textHeight * text.scale / 2) - 12 + text.center.y,
@@ -92,7 +99,7 @@ class TextView: UIView {
             height: textHeight * text.scale + 24
         )
 
-        return rect.contains(point)
+        return rect.contains(newPoint)
     }
 
     func findSelectedText(in point: CGPoint) -> Int? {
@@ -106,7 +113,16 @@ class TextView: UIView {
                 height: textHeight * text.scale + 24
             )
 
-            if rect.contains(point) {
+            let length = sqrt(pow(point.x - text.center.x, 2) + pow(point.y - text.center.y, 2))
+
+            let newPoint = text.center + CGPoint(
+                x: length * (cos(-text.rotation) + sin(-text.rotation)),
+                y: length * (cos(-text.rotation) - sin(-text.rotation))
+            )
+
+            print(point - text.center, newPoint - text.center)
+
+            if rect.contains(newPoint) {
                 firstTransformPoint = text.center + CGPoint(x: cos(text.rotation), y: sin(text.rotation)) * (textWidth * text.scale / 2 + 12)
                 secondTransformPoint = text.center - CGPoint(x: cos(text.rotation), y: sin(text.rotation)) * (textWidth * text.scale / 2 + 12)
 
@@ -351,6 +367,10 @@ class TextView: UIView {
                 height: textHeight
             )
         )
+    }
+
+    var result: UIImage {
+        return image.image!
     }
 
     private func drawText() {

@@ -92,7 +92,7 @@ class CollectionTransitionController {
         let fromCellCenter = fromCellFrame.center - fromCollection.contentOffset
         let toCellCenter = toCellFrame.center - toCollection.contentOffset
 
-        toCollection.contentOffset.y += (toCellCenter.y - screenCenter.y)
+        toCollection.contentOffset.y += (toCellCenter.y - fromCellCenter.y)
 
         fromLayoutXOffsetInterpolator = Interpolator(
             from: 0,
@@ -101,7 +101,7 @@ class CollectionTransitionController {
 
         fromLayoutYOffsetInterpolator = Interpolator(
             from: 0,
-            to: (screenCenter.y - fromCellCenter.y) * cellScaling
+            to: (screenCenter.y - fromCellCenter.y) * cellScaling - (screenCenter.y - fromCellCenter.y)
         )
 
         toLayoutXOffsetInterpolator = Interpolator(
@@ -110,7 +110,7 @@ class CollectionTransitionController {
         )
 
         toLayoutYOffsetInterpolator = Interpolator(
-            from: (fromCellCenter.y - screenCenter.y),
+            from: (fromCellCenter.y - screenCenter.y) - (fromCellCenter.y - screenCenter.y) * (1 / cellScaling),
             to: 0
         )
 

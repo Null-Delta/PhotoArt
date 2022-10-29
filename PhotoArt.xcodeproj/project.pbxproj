@@ -11,16 +11,17 @@
 		860ABBF6290B142F007E934D /* ColorPickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860ABBF5290B142F007E934D /* ColorPickerController.swift */; };
 		860ABBF8290B15C9007E934D /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860ABBF7290B15C9007E934D /* UIView+Extensions.swift */; };
 		860ABBFA290B19FF007E934D /* ColorSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860ABBF9290B19FF007E934D /* ColorSlider.swift */; };
-		862947E9290872CD00391E55 /* EditMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947E8290872CD00391E55 /* EditMenu.swift */; };
+		8625C4C3290C4DDD00DFEE15 /* ColorSlidersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8625C4C2290C4DDD00DFEE15 /* ColorSlidersView.swift */; };
 		862947EB29087C2D00391E55 /* TextStyleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947EA29087C2D00391E55 /* TextStyleButton.swift */; };
 		862947F12908800800391E55 /* TextAlignmentButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947F02908800800391E55 /* TextAlignmentButton.swift */; };
 		862947F32908924400391E55 /* TextInputController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862947F22908924400391E55 /* TextInputController.swift */; };
 		863793BC28F9776800C64A82 /* AccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793BB28F9776800C64A82 /* AccessController.swift */; };
 		863793BF28F978F200C64A82 /* AccessTransitioningDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */; };
 		863793C128F9790E00C64A82 /* AccessDisappearAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */; };
-		8658A7882901E5100070C893 /* BeizerLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8658A7872901E5100070C893 /* BeizerLine.swift */; };
-		8658A78A2901EB780070C893 /* BeizerShader.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8658A7892901EB780070C893 /* BeizerShader.metal */; };
-		8658A78C2901EC7E0070C893 /* Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8658A78B2901EC7E0070C893 /* Canvas.swift */; };
+		864CFE97290C52DC00FC9610 /* ColorGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864CFE96290C52DC00FC9610 /* ColorGridView.swift */; };
+		864CFE99290C6E4B00FC9610 /* SpectrumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864CFE98290C6E4B00FC9610 /* SpectrumView.swift */; };
+		864CFE9B290D019100FC9610 /* SelectedColorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864CFE9A290D019100FC9610 /* SelectedColorView.swift */; };
+		864CFE9E290D11B500FC9610 /* SavedColorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864CFE9D290D11B500FC9610 /* SavedColorCell.swift */; };
 		8668D71928F73BAD00A2E72E /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71828F73BAC00A2E72E /* UIColor+Extensions.swift */; };
 		8668D71B28F751B300A2E72E /* Switcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71A28F751B300A2E72E /* Switcher.swift */; };
 		8668D71E28F7592400A2E72E /* Tool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8668D71D28F7592400A2E72E /* Tool.swift */; };
@@ -70,16 +71,17 @@
 		860ABBF5290B142F007E934D /* ColorPickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerController.swift; sourceTree = "<group>"; };
 		860ABBF7290B15C9007E934D /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		860ABBF9290B19FF007E934D /* ColorSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSlider.swift; sourceTree = "<group>"; };
-		862947E8290872CD00391E55 /* EditMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMenu.swift; sourceTree = "<group>"; };
+		8625C4C2290C4DDD00DFEE15 /* ColorSlidersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSlidersView.swift; sourceTree = "<group>"; };
 		862947EA29087C2D00391E55 /* TextStyleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyleButton.swift; sourceTree = "<group>"; };
 		862947F02908800800391E55 /* TextAlignmentButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextAlignmentButton.swift; sourceTree = "<group>"; };
 		862947F22908924400391E55 /* TextInputController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputController.swift; sourceTree = "<group>"; };
 		863793BB28F9776800C64A82 /* AccessController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessController.swift; sourceTree = "<group>"; };
 		863793BE28F978F200C64A82 /* AccessTransitioningDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessTransitioningDelegate.swift; sourceTree = "<group>"; };
 		863793C028F9790E00C64A82 /* AccessDisappearAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessDisappearAnimation.swift; sourceTree = "<group>"; };
-		8658A7872901E5100070C893 /* BeizerLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeizerLine.swift; sourceTree = "<group>"; };
-		8658A7892901EB780070C893 /* BeizerShader.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BeizerShader.metal; sourceTree = "<group>"; };
-		8658A78B2901EC7E0070C893 /* Canvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Canvas.swift; sourceTree = "<group>"; };
+		864CFE96290C52DC00FC9610 /* ColorGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorGridView.swift; sourceTree = "<group>"; };
+		864CFE98290C6E4B00FC9610 /* SpectrumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumView.swift; sourceTree = "<group>"; };
+		864CFE9A290D019100FC9610 /* SelectedColorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedColorView.swift; sourceTree = "<group>"; };
+		864CFE9D290D11B500FC9610 /* SavedColorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedColorCell.swift; sourceTree = "<group>"; };
 		8668D71828F73BAC00A2E72E /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		8668D71A28F751B300A2E72E /* Switcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Switcher.swift; sourceTree = "<group>"; };
 		8668D71D28F7592400A2E72E /* Tool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tool.swift; sourceTree = "<group>"; };
@@ -137,8 +139,13 @@
 		860ABBFB290B1B3D007E934D /* ColorPicker */ = {
 			isa = PBXGroup;
 			children = (
+				864CFE9C290D11A600FC9610 /* SavedColors */,
 				860ABBF5290B142F007E934D /* ColorPickerController.swift */,
 				860ABBF9290B19FF007E934D /* ColorSlider.swift */,
+				8625C4C2290C4DDD00DFEE15 /* ColorSlidersView.swift */,
+				864CFE96290C52DC00FC9610 /* ColorGridView.swift */,
+				864CFE98290C6E4B00FC9610 /* SpectrumView.swift */,
+				864CFE9A290D019100FC9610 /* SelectedColorView.swift */,
 			);
 			name = ColorPicker;
 			sourceTree = "<group>";
@@ -161,13 +168,12 @@
 			name = Access;
 			sourceTree = "<group>";
 		};
-		8658A7862901E5020070C893 /* Actions */ = {
+		864CFE9C290D11A600FC9610 /* SavedColors */ = {
 			isa = PBXGroup;
 			children = (
-				8658A7872901E5100070C893 /* BeizerLine.swift */,
-				8658A7892901EB780070C893 /* BeizerShader.metal */,
+				864CFE9D290D11B500FC9610 /* SavedColorCell.swift */,
 			);
-			name = Actions;
+			name = SavedColors;
 			sourceTree = "<group>";
 		};
 		8668D71C28F7591C00A2E72E /* Tool */ = {
@@ -227,12 +233,9 @@
 			children = (
 				860ABBFB290B1B3D007E934D /* ColorPicker */,
 				86C40F5D29057343003C8573 /* TextEditor */,
-				8658A7862901E5020070C893 /* Actions */,
 				8699626428F4187F00F3850F /* ToolBar */,
 				8699625228F3611C00F3850F /* EditorViewController.swift */,
 				8699626228F378B600F3850F /* EditorNavigationBar.swift */,
-				8658A78B2901EC7E0070C893 /* Canvas.swift */,
-				862947E8290872CD00391E55 /* EditMenu.swift */,
 			);
 			name = Editor;
 			sourceTree = "<group>";
@@ -441,7 +444,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				863793C128F9790E00C64A82 /* AccessDisappearAnimation.swift in Sources */,
+				864CFE99290C6E4B00FC9610 /* SpectrumView.swift in Sources */,
 				8668D72028F75ADB00A2E72E /* PencilTool.swift in Sources */,
+				864CFE9B290D019100FC9610 /* SelectedColorView.swift in Sources */,
 				8699624328F3602900F3850F /* ViewController.swift in Sources */,
 				86C40F5F29057358003C8573 /* TextView.swift in Sources */,
 				86A4817228F899D900207D58 /* GalleryCell.swift in Sources */,
@@ -450,18 +455,18 @@
 				860ABBF6290B142F007E934D /* ColorPickerController.swift in Sources */,
 				86A4817E28F9588B00207D58 /* UIVisualEffect+Extensions.swift in Sources */,
 				8699623F28F3602900F3850F /* AppDelegate.swift in Sources */,
+				8625C4C3290C4DDD00DFEE15 /* ColorSlidersView.swift in Sources */,
 				8668D72A28F8106100A2E72E /* DefaultTool.swift in Sources */,
 				8668D71E28F7592400A2E72E /* Tool.swift in Sources */,
 				8668D72C28F8117300A2E72E /* DefaultDrawTool.swift in Sources */,
 				860ABBF4290B09DF007E934D /* FontSizeSlider.swift in Sources */,
 				86B0784028FD85A200B4EB3F /* GalleryGrid.swift in Sources */,
-				8658A78A2901EB780070C893 /* BeizerShader.metal in Sources */,
-				8658A7882901E5100070C893 /* BeizerLine.swift in Sources */,
 				868C5D2728F5992A0064FD18 /* ColorButton.swift in Sources */,
 				86A4817C28F951F200207D58 /* GalleryLayout.swift in Sources */,
 				8668D72828F77B0F00A2E72E /* EraseTool.swift in Sources */,
 				86EA1A3728FB4254006819F5 /* CollectionTransitionController.swift in Sources */,
 				860ABBF8290B15C9007E934D /* UIView+Extensions.swift in Sources */,
+				864CFE9E290D11B500FC9610 /* SavedColorCell.swift in Sources */,
 				862947EB29087C2D00391E55 /* TextStyleButton.swift in Sources */,
 				863793BF28F978F200C64A82 /* AccessTransitioningDelegate.swift in Sources */,
 				862947F32908924400391E55 /* TextInputController.swift in Sources */,
@@ -473,7 +478,7 @@
 				8699626328F378B600F3850F /* EditorNavigationBar.swift in Sources */,
 				86A4817628F89E8700207D58 /* HeroTransitioningDelegate.swift in Sources */,
 				8668D71928F73BAD00A2E72E /* UIColor+Extensions.swift in Sources */,
-				862947E9290872CD00391E55 /* EditMenu.swift in Sources */,
+				864CFE97290C52DC00FC9610 /* ColorGridView.swift in Sources */,
 				8668D72428F7722E00A2E72E /* BrushTool.swift in Sources */,
 				86EA1A3528FB2BA4006819F5 /* Interpolation.swift in Sources */,
 				860ABBFA290B19FF007E934D /* ColorSlider.swift in Sources */,
@@ -481,7 +486,6 @@
 				86B0783B28FC7E9A00B4EB3F /* ValueAnimator.swift in Sources */,
 				863793BC28F9776800C64A82 /* AccessController.swift in Sources */,
 				86A4817028F8992C00207D58 /* GalleryController.swift in Sources */,
-				8658A78C2901EC7E0070C893 /* Canvas.swift in Sources */,
 				8699626128F36E1D00F3850F /* CGPoint+Extensions.swift in Sources */,
 				86A4817828F89EBE00207D58 /* HeroAppearAnimation.swift in Sources */,
 				8668D71B28F751B300A2E72E /* Switcher.swift in Sources */,
@@ -644,7 +648,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = delta.null.PhotoArt;
+				PRODUCT_BUNDLE_IDENTIFIER = delta.null.PhotoArt4;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -676,7 +680,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = delta.null.PhotoArt;
+				PRODUCT_BUNDLE_IDENTIFIER = delta.null.PhotoArt4;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

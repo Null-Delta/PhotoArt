@@ -240,31 +240,41 @@ class GalleryGrid: UIView {
     }
 
     func animateZoom(atIndex: Int) {
-//        zoomCellIndex = atIndex
-//        currentCollection = allCollections.last!
-//        let nextCollection = getNextAfter(collection: currentCollection)
-//        transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
-//        lastScale = globalScale
-//        let deltaScale = 1.6
-//        print(localScale)
-//        print(deltaScale)
-//
-//        animator = ValueAnimator(duration: 0.5, animation: {[unowned self] progress in
-//            pinchGesture.scale =  1 + deltaScale * progress
-//            aaa()
-//        }, curve: { x in
-//            return 1 - pow(1 - x, 2)
-//        }, complition: { [unowned self] isComplete in
-//            self.transitionController!.progress = progress
-//            currentCollection = self.transitionController!.toCollection
-//
-//            self.transitionController = nil
-//            animator = nil
-//            localScale = globalScale
-//        })
-//
-//        animator?.start()
+        zoomCellIndex = atIndex
+        currentCollection = allCollections.last!
+        let nextCollection = getNextAfter(collection: currentCollection)
+        transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
+        lastScale = globalScale
+        let deltaScale = 1.6
+        print(localScale)
+        print(deltaScale)
+
+        animator = ValueAnimator(duration: 0.5, animation: {[unowned self] progress in
+            pinchGesture.scale =  1 + deltaScale * progress
+            aaa()
+        }, curve: { x in
+            return 1 - pow(1 - x, 2)
+        }, complition: { [unowned self] isComplete in
+            self.transitionController!.progress = progress
+            currentCollection = self.transitionController!.toCollection
+
+            self.transitionController = nil
+            animator = nil
+            localScale = globalScale
+        })
+
+        animator?.start()
     }
+
+    func reloadItem(at: Int) {
+        for collection in allCollections {
+            let layout = collection.collectionViewLayout as! GalleryLayout
+            if at - layout.itemsOffset >= 0 {
+                collection.reloadItems(at: [IndexPath(item: at - layout.itemsOffset, section: 0)])
+            }
+        }
+    }
+
 
     init(
         delegate: UICollectionViewDelegate? = nil,

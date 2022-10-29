@@ -12,9 +12,9 @@ class AccessDisappearAnimation: NSObject, UIViewControllerAnimatedTransitioning 
     lazy private var maskGradient: CAGradientLayer = {
         let gradient = CAGradientLayer()
         gradient.colors = [
-            UIColor.black.withAlphaComponent(0.0).cgColor,
             UIColor.black.withAlphaComponent(1.0).cgColor,
-            UIColor.black.withAlphaComponent(1.0).cgColor
+            UIColor.black.withAlphaComponent(1.0).cgColor,
+            UIColor.black.withAlphaComponent(0.0).cgColor
         ]
         gradient.locations = [-0.2, 0, 1]
         gradient.startPoint = CGPoint(x: 0.5, y: 0)
@@ -27,13 +27,17 @@ class AccessDisappearAnimation: NSObject, UIViewControllerAnimatedTransitioning 
     }
 
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        
         guard
-            let fromView = transitionContext.view(forKey: .from)
+            let fromView = transitionContext.view(forKey: .to)
+            //let toView = transitionContext.view(forKey: .to)
         else { return }
 
         transitionContext.containerView.addSubview(fromView)
+        
         maskGradient.frame = fromView.bounds
 
+        fromView.alpha = 0.99
         fromView.layer.mask = maskGradient
         maskGradient.locations = [1, 1.2, 1.4]
 
@@ -45,9 +49,8 @@ class AccessDisappearAnimation: NSObject, UIViewControllerAnimatedTransitioning 
         self.maskGradient.add(anim, forKey: "locations")
 
         UIView.animate(withDuration: 0.25, delay: 0,options: .curveEaseInOut, animations: {
-            fromView.alpha = 0.99
+            fromView.alpha = 1
         }, completion: { _ in
-            fromView.removeFromSuperview()
             transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
         })
     }
