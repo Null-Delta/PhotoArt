@@ -46,8 +46,9 @@ class HeroDisappearAnimation: NSObject, UIViewControllerAnimatedTransitioning {
             width: resultWidth,
             height: resultHeight
         )
+        animationImage.layer.minificationFilter = .trilinear
 
-        animationImage.image = controller.overridedAsset?.preview        
+        animationImage.image = controller.overridedAsset?.preview ?? controller.image
 
         transitionContext.containerView.addSubview(resultView)
         transitionContext.containerView.addSubview(animationImage)

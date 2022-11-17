@@ -69,7 +69,7 @@ class TextView: UIView {
     private var textHeight: CGFloat = 0
     private var paragraphStyle: NSMutableParagraphStyle!
     private var attributes: [NSAttributedString.Key: Any]!
-    private var sizePoint: CGFloat = 8.0
+    private var sizePoint: CGFloat = 12.0
 
     var selectedText: Int? = 0
 
@@ -85,18 +85,18 @@ class TextView: UIView {
 
         setup(with: texts[selectedText])
 
-        let length = sqrt(pow(point.x - text.center.x, 2) + pow(point.y - text.center.y, 2))
-
-        let newPoint = text.center + CGPoint(
-            x: length * (cos(-text.rotation) - sin(-text.rotation)),
-            y: length * (cos(-text.rotation) + sin(-text.rotation))
-        )
-
         let rect = CGRect(
             x: -(textWidth * text.scale / 2) - 12 + text.center.x,
             y: -(textHeight * text.scale / 2) - 12 + text.center.y,
             width: textWidth * text.scale + 24,
             height: textHeight * text.scale + 24
+        )
+
+        let localPoint = point - text.center
+
+        let newPoint = text.center + CGPoint(
+            x: localPoint.x * cos(-text.rotation) - localPoint.y * sin(-text.rotation),
+            y: localPoint.x * sin(-text.rotation) + localPoint.y * cos(-text.rotation)
         )
 
         return rect.contains(newPoint)
@@ -113,14 +113,13 @@ class TextView: UIView {
                 height: textHeight * text.scale + 24
             )
 
-            let length = sqrt(pow(point.x - text.center.x, 2) + pow(point.y - text.center.y, 2))
+            let localPoint = point - text.center
+
 
             let newPoint = text.center + CGPoint(
-                x: length * (cos(-text.rotation) + sin(-text.rotation)),
-                y: length * (cos(-text.rotation) - sin(-text.rotation))
+                x: localPoint.x * cos(-text.rotation) - localPoint.y * sin(-text.rotation),
+                y: localPoint.x * sin(-text.rotation) + localPoint.y * cos(-text.rotation)
             )
-
-            print(point - text.center, newPoint - text.center)
 
             if rect.contains(newPoint) {
                 firstTransformPoint = text.center + CGPoint(x: cos(text.rotation), y: sin(text.rotation)) * (textWidth * text.scale / 2 + 12)
@@ -286,22 +285,22 @@ class TextView: UIView {
                 if lineIndex != 0 && lineRect(line: lineIndex).maxX == lineRect(line: lineIndex - 1).maxX {
                     ctx.addLine(to: CGPoint(x: lineFrame.maxX, y: lineFrame.minY))
                 } else if lineIndex == 0 || lineRect(line: lineIndex).maxX > lineRect(line: lineIndex - 1).maxX {
-                    let radius = min(lineIndex == 0 ? 8.0 : abs(lineRect(line: lineIndex).maxX - lineRect(line: lineIndex - 1).maxX), 8.0)
+                    let radius = min(lineIndex == 0 ? sizePoint : abs(lineRect(line: lineIndex).maxX - lineRect(line: lineIndex - 1).maxX), sizePoint)
 
                     drawArc(in: ctx, lineIndex: lineIndex, corner: (.right, .top), isIn: true, isReverse: false, radius: radius)
                 } else {
-                    let radius = min(lineIndex == 0 ? 8.0 : abs(lineRect(line: lineIndex).maxX - lineRect(line: lineIndex - 1).maxX), 8.0)
+                    let radius = min(lineIndex == 0 ? sizePoint : abs(lineRect(line: lineIndex).maxX - lineRect(line: lineIndex - 1).maxX), sizePoint)
                     drawArc(in: ctx, lineIndex: lineIndex, corner: (.right, .top), isIn: false, isReverse: false, radius: radius)
                 }
 
                 if lineIndex != lines.count - 1 && lineRect(line: lineIndex).maxX == lineRect(line: lineIndex + 1).maxX {
                     ctx.addLine(to: CGPoint(x: lineFrame.maxX, y: lineFrame.maxY))
                 } else if lineIndex == lines.count - 1 || lineRect(line: lineIndex).maxX > lineRect(line: lineIndex + 1).maxX {
-                    let radius = min(lineIndex == lines.count - 1 ? 8.0 : abs(lineRect(line: lineIndex).maxX - lineRect(line: lineIndex + 1).maxX), 8.0)
+                    let radius = min(lineIndex == lines.count - 1 ? sizePoint : abs(lineRect(line: lineIndex).maxX - lineRect(line: lineIndex + 1).maxX), sizePoint)
 
                     drawArc(in: ctx, lineIndex: lineIndex, corner: (.right, .down), isIn: true, isReverse: false, radius: radius)
                 } else {
-                    let radius = min(lineIndex == lines.count - 1 ? 8.0 : abs(lineRect(line: lineIndex).maxX - lineRect(line: lineIndex + 1).maxX), 8.0)
+                    let radius = min(lineIndex == lines.count - 1 ? sizePoint : abs(lineRect(line: lineIndex).maxX - lineRect(line: lineIndex + 1).maxX), sizePoint)
                     drawArc(in: ctx, lineIndex: lineIndex, corner: (.right, .down), isIn: false, isReverse: false, radius: radius)
                 }
 
@@ -313,11 +312,11 @@ class TextView: UIView {
                 if lineIndex != 0 && lineRect(line: lineIndex).minX == lineRect(line: lineIndex - 1).minX {
                     ctx.addLine(to: CGPoint(x: lineFrame.minX, y: lineFrame.minY))
                 } else if lineIndex == 0 || lineRect(line: lineIndex).minX < lineRect(line: lineIndex - 1).minX {
-                    let radius = min(lineIndex == 0 ? 8.0 : abs(lineRect(line: lineIndex).minX - lineRect(line: lineIndex - 1).minX), 8.0)
+                    let radius = min(lineIndex == 0 ? sizePoint : abs(lineRect(line: lineIndex).minX - lineRect(line: lineIndex - 1).minX), sizePoint)
 
                     drawArc(in: ctx, lineIndex: lineIndex, corner: (.left, .top), isIn: true, isReverse: false, radius: radius)
                 } else {
-                    let radius = min(lineIndex == 0 ? 8.0 : abs(lineRect(line: lineIndex).minX - lineRect(line: lineIndex - 1).minX), 8.0)
+                    let radius = min(lineIndex == 0 ? sizePoint : abs(lineRect(line: lineIndex).minX - lineRect(line: lineIndex - 1).minX), sizePoint)
 
                     drawArc(in: ctx, lineIndex: lineIndex, corner: (.left, .top), isIn: false, isReverse: false, radius: radius)
                 }
@@ -325,11 +324,11 @@ class TextView: UIView {
                 if lineIndex != lines.count - 1 && lineRect(line: lineIndex).minX == lineRect(line: lineIndex + 1).minX {
                     ctx.addLine(to: CGPoint(x: lineFrame.minX, y: lineFrame.maxY))
                 } else if lineIndex == lines.count - 1 || lineRect(line: lineIndex).minX < lineRect(line: lineIndex + 1).minX {
-                    let radius = min(lineIndex == lines.count - 1 ? 8.0 : abs(lineRect(line: lineIndex).minX - lineRect(line: lineIndex + 1).minX), 8.0)
+                    let radius = min(lineIndex == lines.count - 1 ? sizePoint : abs(lineRect(line: lineIndex).minX - lineRect(line: lineIndex + 1).minX), sizePoint)
 
                     drawArc(in: ctx, lineIndex: lineIndex, corner: (.left, .down), isIn: true, isReverse: false, radius: radius)
                 } else {
-                    let radius = min(lineIndex == lines.count - 1 ? 8.0 : abs(lineRect(line: lineIndex).minX - lineRect(line: lineIndex + 1).minX), 8.0)
+                    let radius = min(lineIndex == lines.count - 1 ? sizePoint : abs(lineRect(line: lineIndex).minX - lineRect(line: lineIndex + 1).minX), sizePoint)
 
                     drawArc(in: ctx, lineIndex: lineIndex, corner: (.left, .down), isIn: false, isReverse: false, radius: radius)
                 }

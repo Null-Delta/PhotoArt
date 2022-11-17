@@ -31,6 +31,7 @@ class EditorViewController: UIViewController {
             onUndo: { [unowned self] in
                 canvas.undoManager?.undo()
                 navigationBar.isUndoEnabled = canvas.undoManager!.canUndo
+                navigationBar.isClearEnabled = canvas.undoManager!.canUndo || !objectsLayer.texts.isEmpty || !canvas.drawing.bounds.isEmpty
             },
             onClearAll: { [unowned self] in
                 canvas.drawing = PKDrawing()
@@ -39,6 +40,7 @@ class EditorViewController: UIViewController {
                 objectsLayer.state = .nothing
 
                 navigationBar.isUndoEnabled = false
+                navigationBar.isClearEnabled = false
                 objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
             }
         )
@@ -53,6 +55,21 @@ class EditorViewController: UIViewController {
         bar.translatesAutoresizingMaskIntoConstraints = false
 
         bar.onEditorExit = { [unowned self] in
+            if canvas.undoManager!.canUndo {
+                let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+                alert.addAction(UIAlertAction(title: "Undo Changes", style: .destructive, handler: { _ in
+                    self.dismiss(animated: true)
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+                present(alert, animated: true)
+            } else {
+                dismiss(animated: true)
+            }
+        }
+
+        bar.onEditorFinish = { [unowned self] in
             objectsLayer.selectedText = nil
             objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
 
@@ -65,7 +82,6 @@ class EditorViewController: UIViewController {
 
             UITraitCollection.current = currentTraits
 
-            print(canvas.bounds.size, drawImage.size, image.size)
             let overrideAsset = OverridedAsset(
                 preview: UIImage.merge(images: [overridedAsset?.sourcePreview ?? image, objectsLayer.result, drawImage]),
                 sourcePreview: image,
@@ -101,6 +117,7 @@ class EditorViewController: UIViewController {
                 objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
             })
 
+            navigationBar.isClearEnabled = true
             navigationBar.isUndoEnabled = true
         }
 
@@ -133,6 +150,7 @@ class EditorViewController: UIViewController {
                 })
 
                 navigationBar.isUndoEnabled = true
+                navigationBar.isClearEnabled = true
             }
 
             inputController.onInputCancel = { [unowned self] in
@@ -220,7 +238,23 @@ class EditorViewController: UIViewController {
     }
 
     @objc private func onTextDuplicate() {
+        let oldIndex = objectsLayer.selectedText!
+        let textCopy = objectsLayer.texts[objectsLayer.selectedText!]
+        objectsLayer.texts.append(textCopy)
+
+        objectsLayer.selectedText = objectsLayer.texts.count - 1
+        objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+
+        canvas.undoManager?.registerUndo(withTarget: self, handler: { [unowned self] _ in
+            objectsLayer.texts.remove(at: objectsLayer.texts.count - 1)
+            objectsLayer.selectedText = oldIndex
+            objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
+        })
+
         wasSecondTap = false
+
+        navigationBar.isClearEnabled = true
+        navigationBar.isUndoEnabled = true
     }
 
     @objc private func onTextBrindToFront() {
@@ -234,6 +268,9 @@ class EditorViewController: UIViewController {
             objectsLayer.selectedText = oldIndex
             objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
         })
+
+        navigationBar.isUndoEnabled = true
+        navigationBar.isClearEnabled = true
 
         wasSecondTap = false
     }
@@ -254,6 +291,9 @@ class EditorViewController: UIViewController {
         })
 
         wasSecondTap = false
+        navigationBar.isClearEnabled = true
+        navigationBar.isUndoEnabled = true
+
     }
 
     @objc private func onTextEdit() {
@@ -284,6 +324,10 @@ class EditorViewController: UIViewController {
 
                 objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
             })
+
+            navigationBar.isClearEnabled = true
+            navigationBar.isUndoEnabled = true
+
         }
 
         present(inputController, animated: true)
@@ -297,6 +341,10 @@ class EditorViewController: UIViewController {
         else { return }
 
         if objectsLayer.selectedText == tapText {
+            startCenter = objectsLayer.texts[tapText].center
+            startAngle = objectsLayer.texts[tapText].rotation
+            startScale = objectsLayer.texts[tapText].scale
+
             if !wasSecondTap {
                 wasSecondTap = true
                 UIMenuController.shared.menuItems = [
@@ -306,7 +354,7 @@ class EditorViewController: UIViewController {
                     UIMenuItem(title: "Duplicate", action: #selector(onTextDuplicate)),
                 ]
 
-                UIMenuController.shared.showMenu(from: objectsLayer, rect: CGRect(origin: textTapGesture.location(in: objectsLayer), size: CGSize(width: 1, height: 1)))
+                UIMenuController.shared.showMenu(from: view, rect: CGRect(origin: textTapGesture.location(in: view) - CGPoint(x: 0, y: 32), size: CGSize(width: 1, height: 1)))
             } else {
                 onTextEdit()
             }
@@ -356,6 +404,7 @@ class EditorViewController: UIViewController {
 
             if (length(point: objectsLayer.firstTransformPoint! - touchStart) < 24 || length(point: objectsLayer.secondTransformPoint! - touchStart) < 24) {
                 objectsLayer.state = .scaling
+                startCenter = objectsLayer.texts[objectsLayer.selectedText!].center
                 startScale = objectsLayer.texts[objectsLayer.selectedText!].scale
                 startAngle = objectsLayer.texts[objectsLayer.selectedText!].rotation
 
@@ -371,13 +420,20 @@ class EditorViewController: UIViewController {
                 objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
 
                 toolBar.setText(text: objectsLayer.texts[objectsLayer.selectedText!])
-
             } else {
-                objectsLayer.selectedText = objectsLayer.findSelectedText(in: touchStart)
+                let newSelection = objectsLayer.findSelectedText(in: touchStart)
+
+                if newSelection != objectsLayer.selectedText {
+                    wasSecondTap = false
+                    objectsLayer.selectedText = objectsLayer.findSelectedText(in: touchStart)
+                }
 
                 if objectsLayer.isInCurrentRect(point: touchStart) {
                     objectsLayer.state = .moving
                     startCenter = objectsLayer.texts[objectsLayer.selectedText!].center
+                    startScale = objectsLayer.texts[objectsLayer.selectedText!].scale
+                    startAngle = objectsLayer.texts[objectsLayer.selectedText!].rotation
+
 
                     objectsLayer.drawTexts(size: objectsLayer.bounds.size / canvas.zoomScale)
                     toolBar.setText(text: objectsLayer.texts[objectsLayer.selectedText!])
@@ -393,6 +449,8 @@ class EditorViewController: UIViewController {
 
         case .changed:
             guard objectsLayer.state != .nothing else { return }
+
+            wasSecondTap = false
 
             if objectsLayer.state == .scaling {
                 objectsLayer.texts[objectsLayer.selectedText!].scale = startScale * length(point: objectsLayer.texts[objectsLayer.selectedText!].center - position) / length(point: objectsLayer.texts[objectsLayer.selectedText!].center - touchStart)
@@ -413,7 +471,6 @@ class EditorViewController: UIViewController {
             let actionScale = startScale
             let textIndex = objectsLayer.selectedText!
             let currentText = objectsLayer.texts[objectsLayer.selectedText!]
-            print(textIndex, actionCenter, actionAngle, actionScale)
 
             guard
                 actionCenter != currentText.center ||
@@ -422,7 +479,6 @@ class EditorViewController: UIViewController {
             else { return }
 
             canvas.undoManager!.registerUndo(withTarget: self, handler: { [unowned self, actionCenter, actionAngle, actionScale, textIndex] _ in
-                print(textIndex, actionCenter, actionAngle, actionScale)
 
                 objectsLayer.selectedText = textIndex
                 objectsLayer.texts[textIndex].center = actionCenter
@@ -434,13 +490,12 @@ class EditorViewController: UIViewController {
             })
 
             navigationBar.isUndoEnabled = true
+            navigationBar.isClearEnabled = true
 
         default:
             break
         }
     }
-
-
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -469,6 +524,7 @@ class EditorViewController: UIViewController {
         playerLayer.frame = imageView.bounds
 
         navigationBar.isUndoEnabled = false
+        navigationBar.isClearEnabled = !objectsLayer.texts.isEmpty || !canvas.drawing.bounds.isEmpty
     }
 
     override func viewDidLoad() {
@@ -517,7 +573,7 @@ class EditorViewController: UIViewController {
         }
 
         guard let overridedAsset = overridedAsset else { return }
-        canvas.drawing = overridedAsset.drawing
+        canvas.drawing.append(overridedAsset.drawing)
         objectsLayer.texts = overridedAsset.texts
 
         if video == nil {
@@ -582,6 +638,7 @@ extension EditorViewController: PKCanvasViewDelegate {
 
     func canvasViewDidEndUsingTool(_ canvasView: PKCanvasView) {
         navigationBar.isUndoEnabled = true
+        navigationBar.isClearEnabled = true
     }
 }
 

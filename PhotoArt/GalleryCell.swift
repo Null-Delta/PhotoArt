@@ -12,6 +12,7 @@ class GalleryCell: UICollectionViewCell {
         let view = UIImageView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.contentMode = .scaleAspectFill
+        view.layer.minificationFilter = .trilinear
 
         view.clipsToBounds = true
         return view

@@ -8,12 +8,6 @@
 import UIKit
 
 class GalleryGrid: UIView {
-    private var layout1 = GalleryLayout(countOfColumns: 1)
-    private var layout3 = GalleryLayout(countOfColumns: 3)
-    private var layout5 = GalleryLayout(countOfColumns: 5)
-    private var layout7 = GalleryLayout(countOfColumns: 7)
-    private var layout9 = GalleryLayout(countOfColumns: 9)
-
     var delegate: UICollectionViewDelegate?
     var dataSource: UICollectionViewDataSource?
 
@@ -246,8 +240,6 @@ class GalleryGrid: UIView {
         transitionController = CollectionTransitionController(from: currentCollection, to: nextCollection, cell: zoomCellIndex)
         lastScale = globalScale
         let deltaScale = 1.6
-        print(localScale)
-        print(deltaScale)
 
         animator = ValueAnimator(duration: 0.5, animation: {[unowned self] progress in
             pinchGesture.scale =  1 + deltaScale * progress
@@ -255,12 +247,14 @@ class GalleryGrid: UIView {
         }, curve: { x in
             return 1 - pow(1 - x, 2)
         }, complition: { [unowned self] isComplete in
-            self.transitionController!.progress = progress
+            self.transitionController!.progress = 1
             currentCollection = self.transitionController!.toCollection
 
             self.transitionController = nil
             animator = nil
             localScale = globalScale
+            pinchGesture.scale = 1
+            pinchGesture.isEnabled = true
         })
 
         animator?.start()
@@ -292,18 +286,13 @@ class GalleryGrid: UIView {
             GalleryLayout(countOfColumns: 1),
             GalleryLayout(countOfColumns: 3),
             GalleryLayout(countOfColumns: 5),
-            MultiGalleryLayout(countOfColumns: 13)
+            GalleryLayout(countOfColumns: 13)
         ]
 
         for i in 0..<layouts.count {
             let collection = UICollectionView(frame: .zero, collectionViewLayout: layouts[i])
-
-            if i == layouts.count - 1 {
-                collection.register(MultiGalleryCell.self, forCellWithReuseIdentifier: "multi_photo")
-            } else {
-                collection.register(GalleryCell.self, forCellWithReuseIdentifier: "photo")
-            }
-
+            
+            collection.register(GalleryCell.self, forCellWithReuseIdentifier: "photo")
             collection.translatesAutoresizingMaskIntoConstraints = false
             collection.delegate = delegate
             collection.dataSource = dataSource

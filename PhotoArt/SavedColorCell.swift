@@ -9,6 +9,9 @@ import UIKit
 
 class SavedColorCell: UICollectionViewCell {
 
+    var onLongPress: () -> () = { }
+    var onAdd: () -> () = { }
+
     lazy private var colorView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -27,6 +30,18 @@ class SavedColorCell: UICollectionViewCell {
         view.backgroundColor = .clear
 
         return view
+    }()
+
+    lazy private var imageView: UIImageView = {
+        let img = UIImageView()
+
+        img.clipsToBounds = true
+        img.layer.cornerRadius = 16
+        img.backgroundColor = .darkGray
+        img.contentMode = .center
+        img.image = UIImage(systemName: "plus")?.withAlignmentRectInsets(.init(top: 4, left: 4, bottom: 4, right: 4))
+        img.tintColor = .white
+        return img
     }()
 
     var select: Bool {
@@ -49,12 +64,49 @@ class SavedColorCell: UICollectionViewCell {
         }
     }
 
+    var isAdditive: Bool {
+        get {
+            return imageView.alpha == 1
+        }
+
+        set {
+            imageView.alpha = newValue ? 1 : 0
+        }
+    }
+
+    lazy private var longGesture: UILongPressGestureRecognizer = {
+        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(onGesture))
+        gesture.minimumPressDuration = 0.25
+
+        return gesture
+    }()
+
+    @objc private func onGesture() {
+        guard !isAdditive else { return }
+
+        UIMenuController.shared.menuItems = [
+            UIMenuItem(title: "Delete", action: #selector(onDelete))
+        ]
+
+        UIMenuController.shared.showMenu(from: contentView, rect: contentView.bounds)
+    }
+
+    @objc private func onDelete() {
+        onLongPress()
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
 
         contentView.addSubview(colorView)
         contentView.addSubview(colorBorder)
+        contentView.addSubview(imageView)
+
+        imageView.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+
         contentView.backgroundColor = .clear
+
+        contentView.addGestureRecognizer(longGesture)
 
         NSLayoutConstraint.activate([
             colorView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 8),

@@ -98,12 +98,14 @@ class TextInputController: UIViewController {
             textPreview.texts[0].color = color
             textPreview.drawTexts(size: self.view.bounds.size)
         })
+        colorBtn.color = textPreview.texts[0].color
 
         colorBtn.translatesAutoresizingMaskIntoConstraints = false
         colorBtn.widthAnchor.constraint(equalToConstant: 32).isActive = true
         colorBtn.heightAnchor.constraint(equalToConstant: 32).isActive = true
 
         let textStyleBtn = TextStyleButton()
+        textStyleBtn.style = textPreview.texts[0].style
         textStyleBtn.onStyleChange = { [unowned self] style in
             textPreview.texts[0].style =  style
             textPreview.drawTexts(size: self.view.bounds.size)
@@ -114,6 +116,7 @@ class TextInputController: UIViewController {
         textStyleBtn.heightAnchor.constraint(equalToConstant: 32).isActive = true
 
         let textAlignmentBtn = TextAlignmentButton()
+        textAlignmentBtn.alignment = textPreview.texts[0].alignment
         textAlignmentBtn.onAlignmentChange = { [unowned self] alignment in
             textPreview.texts[0].alignment = alignment
             textView.textAlignment = alignment

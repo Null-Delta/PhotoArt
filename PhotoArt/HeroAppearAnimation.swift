@@ -36,6 +36,8 @@ class HeroAppearAnimation: NSObject, UIViewControllerAnimatedTransitioning {
         animationImage.frame = fromImageFrame
         animationImage.contentMode = .scaleAspectFill
         animationImage.image = fromImage.image
+        animationImage.layer.minificationFilter = .trilinear
+
         fromImage.alpha = 0
 
         let resultHeight = controller.view.bounds.width * (animationImage.image!.size.height / animationImage.image!.size.width)

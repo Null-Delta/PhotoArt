@@ -30,6 +30,14 @@ class EditorNavigationBar: UIView {
         }
         set {
             undoButton.isEnabled = newValue
+        }
+    }
+
+    var isClearEnabled: Bool {
+        get {
+            return clearAllButton.isEnabled
+        }
+        set {
             clearAllButton.isEnabled = newValue
         }
     }

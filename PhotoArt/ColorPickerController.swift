@@ -11,18 +11,21 @@ class ColorPickerController: UIViewController {
 
     var onFinish: (UIColor) -> Void = { _ in }
 
+    var savedColors: [UIColor] = []
+
     func setColor(color: UIColor) {
         selectedColorView.color = color
+        savedColorsController.reloadData()
     }
 
-    lazy private var backgroundView: UIVisualEffectView = {
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterialDark))
+    lazy private var backgroundView: UIView = {
+        let view = UIView()
 
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 10
         view.clipsToBounds = true
         view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1)
 
         return view
     }()
@@ -75,6 +78,7 @@ class ColorPickerController: UIViewController {
     }
 
     @objc private func onExit() {
+        UserDefaults.standard.set(savedColors.map { $0.hex }, forKey: "savedColors")
         onFinish(selectedColorView.color)
         dismiss(animated: true)
     }
@@ -84,20 +88,18 @@ class ColorPickerController: UIViewController {
         let location = responser.convert(responser.bounds, to: view)
 
         if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-
-            let offset = max(0, (location.maxY + 16) - (view.frame.height - keyboardSize.height))
-
-            print(offset)
+            print("open")
+            let offset = min(0, (view.frame.height - keyboardSize.height) - (location.maxY + 16))
 
             UIView.animate(withDuration: 0.25) { [unowned self] in
-                view.frame.origin.y = -offset
+                backgroundView.transform = .identity.translatedBy(x: 0, y: offset)
             }
         }
     }
 
     @objc private func onKeyboardHide() {
         UIView.animate(withDuration: 0.25) { [unowned self] in
-            view.frame.origin.y = 0
+            backgroundView.transform = .identity
         }
     }
 
@@ -120,8 +122,11 @@ class ColorPickerController: UIViewController {
         let slider = ColorSlider(
             onChange: { [unowned self] value in
                 selectedColorView.color = UIColor(red: slidersView.color.r, green: slidersView.color.g, blue: slidersView.color.b, alpha: value)
+                savedColorsController.reloadData()
             }
         )
+
+        slider.maxValue = 100
         
         slider.title = "OPASITY"
 
@@ -140,6 +145,7 @@ class ColorPickerController: UIViewController {
             opasitySlider.endColor = color.withAlphaComponent(1)
 
             selectedColorView.color = UIColor(red: slidersView.color.r, green: slidersView.color.g, blue: slidersView.color.b, alpha: opasitySlider.value)
+            savedColorsController.reloadData()
         }
 
         return sliders
@@ -155,6 +161,7 @@ class ColorPickerController: UIViewController {
             opasitySlider.startColor = color.withAlphaComponent(0)
             opasitySlider.endColor = color.withAlphaComponent(1)
             selectedColorView.color = UIColor(red: slidersView.color.r, green: slidersView.color.g, blue: slidersView.color.b, alpha: opasitySlider.value)
+            savedColorsController.reloadData()
         }
 
         return grid
@@ -162,12 +169,14 @@ class ColorPickerController: UIViewController {
 
     lazy private var spectrumView: SpectrumView = {
         let specView = SpectrumView()
+
         specView.onColorChanged = { [unowned self] color in
             gridView.clearSelection()
             slidersView.color = color
             opasitySlider.startColor = color.withAlphaComponent(0)
             opasitySlider.endColor = color.withAlphaComponent(1)
             selectedColorView.color = UIColor(red: slidersView.color.r, green: slidersView.color.g, blue: slidersView.color.b, alpha: opasitySlider.value)
+            savedColorsController.reloadData()
         }
 
         return specView
@@ -200,6 +209,9 @@ class ColorPickerController: UIViewController {
         gridView.clearSelection()
         slidersView.color = UIColor(red: selectedColorView.color.r, green: selectedColorView.color.g, blue: selectedColorView.color.b, alpha: 1)
         opasitySlider.value = selectedColorView.color.a
+        opasitySlider.startColor = selectedColorView.color.withAlphaComponent(0)
+        opasitySlider.endColor = selectedColorView.color.withAlphaComponent(1)
+        savedColorsController.reloadData()
     }
 
     override func viewDidLayoutSubviews() {
@@ -210,28 +222,29 @@ class ColorPickerController: UIViewController {
     }
 
     override func viewDidLoad() {
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+
+        savedColors = UserDefaults.standard.array(forKey: "savedColors")?.compactMap { UIColor(hex: $0 as! String ) } ?? []
 
         view.addSubview(backgroundView)
-        view.addSubview(exitBtn)
-        view.addSubview(titleLabel)
-        view.addSubview(segmentPicker)
-        view.addSubview(selectedColorView)
-        view.addSubview(separator)
+        backgroundView.addSubview(exitBtn)
+        backgroundView.addSubview(titleLabel)
+        backgroundView.addSubview(segmentPicker)
+        backgroundView.addSubview(selectedColorView)
+        backgroundView.addSubview(separator)
 
-        view.addSubview(opasitySlider)
+        backgroundView.addSubview(opasitySlider)
 
-        view.addSubview(slidersView)
-        view.addSubview(gridView)
-        view.addSubview(spectrumView)
+        backgroundView.addSubview(slidersView)
+        backgroundView.addSubview(gridView)
+        backgroundView.addSubview(spectrumView)
 
-        view.addSubview(savedColorsController)
+        backgroundView.addSubview(savedColorsController)
 
         slidersView.isHidden = true
         spectrumView.isHidden = true
 
         NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardShow), name: UIResponder.keyboardDidShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardShow), name: UIResponder.keyboardDidChangeFrameNotification, object: nil)
+        //NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardShow), name: UIResponder.keyboardDidChangeFrameNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(onKeyboardHide), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         NSLayoutConstraint.activate([
@@ -245,7 +258,7 @@ class ColorPickerController: UIViewController {
             exitBtn.rightAnchor.constraint(equalTo: backgroundView.rightAnchor, constant: -16),
             exitBtn.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 16),
 
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            titleLabel.centerXAnchor.constraint(equalTo: backgroundView.centerXAnchor),
             titleLabel.centerYAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 32),
 
             segmentPicker.leftAnchor.constraint(equalTo: backgroundView.leftAnchor, constant: 16),
@@ -258,12 +271,12 @@ class ColorPickerController: UIViewController {
             selectedColorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
 
             separator.heightAnchor.constraint(equalToConstant: 1),
-            separator.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-            separator.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
+            separator.leftAnchor.constraint(equalTo: backgroundView.leftAnchor, constant: 16),
+            separator.rightAnchor.constraint(equalTo: backgroundView.rightAnchor, constant: -16),
             separator.bottomAnchor.constraint(equalTo: selectedColorView.topAnchor, constant: -22),
 
-            opasitySlider.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16),
-            opasitySlider.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16),
+            opasitySlider.leftAnchor.constraint(equalTo: backgroundView.leftAnchor, constant: 16),
+            opasitySlider.rightAnchor.constraint(equalTo: backgroundView.rightAnchor, constant: -16),
             opasitySlider.bottomAnchor.constraint(equalTo: separator.topAnchor, constant: -24),
 
             slidersView.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 110),
@@ -291,28 +304,51 @@ class ColorPickerController: UIViewController {
 
 extension ColorPickerController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 100
+        return savedColors.count + 1
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "savedColor", for: indexPath) as! SavedColorCell
-        cell.color = .red
+        
+        cell.isAdditive = indexPath.item == savedColors.count
 
-        cell.select = selectedColorView.color == cell.color
+        if !cell.isAdditive {
+            cell.color = savedColors[indexPath.item]
+            cell.select = selectedColorView.color == cell.color
+        } else {
+            cell.select = false
+            cell.color = .clear
+        }
+
+        cell.onLongPress = { [unowned self] in
+            guard let index = collectionView.indexPath(for: cell) else { return }
+            savedColors.remove(at: index.item)
+            collectionView.deleteItems(at: [index])
+        }
+
         return cell
     }
 }
 
 extension ColorPickerController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell = collectionView.cellForItem(at: indexPath) as! SavedColorCell
 
-        self.setColor(color: cell.color)
-        cell.select = true
+        if indexPath.item == savedColors.count {
+            savedColors.append(selectedColorView.color)
+            collectionView.insertItems(at: [indexPath])
+        } else {
+            let cell = collectionView.cellForItem(at: indexPath) as! SavedColorCell
+
+            self.setColor(color: cell.color)
+            spectrumView.clearSelection()
+            gridView.clearSelection()
+            slidersView.color = UIColor(red: selectedColorView.color.r, green: selectedColorView.color.g, blue: selectedColorView.color.b, alpha: 1)
+            opasitySlider.value = selectedColorView.color.a
+            opasitySlider.startColor = selectedColorView.color.withAlphaComponent(0)
+            opasitySlider.endColor = selectedColorView.color.withAlphaComponent(1)
+
+            collectionView.reloadData()
+        }
     }
 
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? SavedColorCell else { return }
-        cell.select = false
-    }
 }

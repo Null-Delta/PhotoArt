@@ -118,8 +118,8 @@ extension GalleryController: UICollectionViewDelegate {
             indexPath.item - layout.itemsOffset >= 0
         else { return }
 
-        if layout is MultiGalleryLayout {
-            //collection.animateZoom(atIndex: indexPath.item * layout.countOfColumns + 1)
+        if layout.countOfColumns == 13 {
+            collection.animateZoom(atIndex: indexPath.item)
         } else {
             guard
                 let cell = collectionView.cellForItem(at: indexPath) as? GalleryCell
@@ -245,11 +245,7 @@ extension GalleryController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let layout = collectionView.collectionViewLayout as? GalleryLayout else { return 0 }
 
-        if layout is MultiGalleryLayout {
-            return Int(ceil(CGFloat(assets.count) / CGFloat(layout.countOfColumns)))
-        } else {
-            return assets.count + layout.itemsOffset
-        }
+        return assets.count + layout.itemsOffset
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -257,97 +253,61 @@ extension GalleryController: UICollectionViewDataSource {
             let layout = collectionView.collectionViewLayout as? GalleryLayout
         else { return UICollectionViewCell() }
 
-        var imageSize: CGSize = CGSize(width: layout.cellSize, height: layout.cellSize)
+        let imageSize: CGSize = CGSize(width: layout.cellSize, height: layout.cellSize)
 
-        if layout is MultiGalleryLayout {
-            imageSize = CGSize(width: 1, height: 1)
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "multi_photo", for: indexPath) as! MultiGalleryCell
-            cell.clearImages()
-            
-            for assetIndex in 0..<13 {
-                let globalIndex = indexPath.item * layout.countOfColumns + assetIndex - layout.itemsOffset
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photo", for: indexPath) as! GalleryCell
 
-                guard
-                    globalIndex >= 0,
-                    globalIndex < assets.count
-                else {
-                    cell.updateImage(at: assetIndex, image: nil)
-                    continue
-                }
+        cell.bordered = layout.countOfColumns <= 5
+        cell.image = nil
 
-                if overridedAssets[globalIndex] != nil {
-                    cell.updateImage(at: assetIndex, image: overridedAssets[globalIndex]?.preview)
-                } else if cachesMiniatures[globalIndex] != nil {
-                    cell.updateImage(at: assetIndex, image: cachesMiniatures[globalIndex])
-                } else {
-                    DispatchQueue.global(qos: .userInitiated).async {[unowned self] in
-                        let options = PHImageRequestOptions()
-                        options.isSynchronous = true
-                        options.isNetworkAccessAllowed = false
-                        options.deliveryMode = .fastFormat
-                        options.resizeMode = .exact
-
-                        manager.requestImage(
-                            for: assets.object(at: globalIndex),
-                            targetSize: imageSize,
-                            contentMode: .aspectFill,
-                            options: options
-                        ) { (image, _) -> Void in
-                            DispatchQueue.main.async { [unowned self] in
-                                cachesMiniatures[globalIndex] = image
-                                cell.updateImage(at: assetIndex, image: image)
-                            }
-                        }
-                    }
-                }
-            }
-
-            return cell
-
-        } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photo", for: indexPath) as! GalleryCell
-
-            cell.bordered = layout.countOfColumns <= 5
-            cell.image = nil
-
-            guard
-                indexPath.item - layout.itemsOffset >= 0
-            else {
-                return cell
-            }
-
-            if overridedAssets[indexPath.item - layout.itemsOffset] != nil {
-                cell.image = overridedAssets[indexPath.item - layout.itemsOffset]?.preview
-            } else {
-                if assets.object(at: indexPath.item - layout.itemsOffset).mediaType == .image {
-                    cell.time = nil
-                } else {
-                    cell.time = toTime(time: assets.object(at: indexPath.item - layout.itemsOffset).duration)
-                }
-
-                DispatchQueue.global(qos: .default).async {[unowned self] in
-                    let options = PHImageRequestOptions()
-                    options.isSynchronous = true
-                    options.isNetworkAccessAllowed = true
-
-                    manager.requestImage(
-                        for: assets.object(at: indexPath.item - layout.itemsOffset),
-                        targetSize: imageSize,
-                        contentMode: .aspectFill,
-                        options: options
-                    ) { (image, _) -> Void in
-                        DispatchQueue.main.async {
-                            cell.image = image
-                        }
-                    }
-                }
-            }
-
+        guard
+            indexPath.item - layout.itemsOffset >= 0
+        else {
             return cell
         }
+
+        if overridedAssets[indexPath.item - layout.itemsOffset] != nil {
+           cell.image = overridedAssets[indexPath.item - layout.itemsOffset]?.preview
+        } else if cachesMiniatures[indexPath.item - layout.itemsOffset] != nil && layout.countOfColumns == 13 {
+            cell.image = cachesMiniatures[indexPath.item - layout.itemsOffset]
+        }  else {
+            if assets.object(at: indexPath.item - layout.itemsOffset).mediaType == .image || layout.countOfColumns == 13 {
+                cell.time = nil
+            } else {
+                cell.time = toTime(time: assets.object(at: indexPath.item - layout.itemsOffset).duration)
+            }
+
+            DispatchQueue.global(qos: .unspecified).async {[unowned self] in
+                let options = PHImageRequestOptions()
+                options.isSynchronous = true
+                options.isNetworkAccessAllowed = true
+
+                manager.requestImage(
+                    for: assets.object(at: indexPath.item - layout.itemsOffset),
+                    targetSize: imageSize,
+                    contentMode: .aspectFill,
+                    options: options
+                ) { (image, _) -> Void in
+                    DispatchQueue.main.async {
+                        if layout.countOfColumns == 13 {
+                            self.cachesMiniatures[indexPath.item - layout.itemsOffset] = image
+                        }
+                        cell.image = image
+                    }
+                }
+            }
+        }
+
+        return cell
     }
 
     private func toTime(time: TimeInterval) -> String {
         return "\(Int(time / 60)):\(Int(time)%60)"
+    }
+}
+
+extension GalleryController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }

@@ -18,6 +18,7 @@ class ToolBar: UIView {
 
     var onToolUpdate: (PKTool) -> Void = { _ in }
     var onEditorExit: () -> Void = { }
+    var onEditorFinish: () -> Void = { }
     var onTextStyleChange: (TextStyle, NSTextAlignment, UIColor) -> Void = { _, _, _ in }
     var onTextInputStart: () -> Void = { }
 
@@ -63,6 +64,7 @@ class ToolBar: UIView {
                 tools[selectedTool].state = .centerized
 
                 UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8) { [unowned self] in
+                    backBtn.alpha = 0
                     for toolIndex in 0..<tools.count where toolIndex != selectedTool {
                         tools[toolIndex].hideTool()
                     }
@@ -76,6 +78,7 @@ class ToolBar: UIView {
                 tools[selectedTool].state = .selected
 
                 UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.8) { [unowned self] in
+                    backBtn.alpha = 1
                     for toolIndex in 0..<tools.count where toolIndex != selectedTool {
                         tools[toolIndex].showTool()
                     }
@@ -171,6 +174,7 @@ class ToolBar: UIView {
 
         btn.setImage(.download, for: .normal)
         btn.tintColor = .white
+        btn.addTarget(self, action: #selector(onDone), for: .touchUpInside)
         return btn
     }()
 
@@ -298,6 +302,10 @@ class ToolBar: UIView {
         return gradient
     }()
 
+    @objc private func onDone() {
+        onEditorFinish()
+    }
+    
     func setupTools() {
         switcher.layoutIfNeeded()
 

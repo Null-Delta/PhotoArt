@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PhotoArt.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>67A1AF18209A5DBBC8DD1D1AC0ED77021F832796</string>
+				<key>dateExpires</key>
+				<string>31.10.2023</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>1</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>67A1AF18209A5DBBC8DD1D1AC0ED77021F832796</string>
+						<key>dateExpires</key>
+						<string>31.10.2023</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>Lottie.framework</string>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>G7668ALM57</string>
+						<key>name</key>
+						<string>Rustam Khakhuk</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>3.4.3</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>G7668ALM57.delta.null.PhotoArt</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>G7668ALM57</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>PhotoArt.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>c5817928-8d87-4d64-85b6-59cb0f91a7ca</string>
+				<key>dateExpires</key>
+				<string>31.10.2023</string>
+				<key>name</key>
+				<string>iOS Team Ad Hoc Provisioning Profile: delta.null.PhotoArt</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>G7668ALM57</string>
+				<key>name</key>
+				<string>Rustam Khakhuk</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>
